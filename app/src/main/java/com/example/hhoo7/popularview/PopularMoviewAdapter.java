@@ -7,32 +7,36 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 
-import java.util.List;
+import java.util.ArrayList;
 
-/**
- * Created by hhoo7 on 2016/8/6.
- */
-public class PopularMoviewAdapter extends ArrayAdapter<PopularMoview> {
-    //创建一个日志标签，标签名称跟随类名
+/*
+* 自定义类，继承自ArrayAdapter
+* 用于加载PopularMovie类到GridView中
+* */
+public class PopularMoviewAdapter extends ArrayAdapter<PopularMovie> {
     private static String LOG_TAG = PopularMoviewAdapter.class.getSimpleName();
 
-    public PopularMoviewAdapter(Activity context, List<PopularMoview> popularMoviews) {
-        super(context,0,popularMoviews);
+    public PopularMoviewAdapter(Activity context, ArrayList<PopularMovie> popularMovies) {
+        super(context,0, popularMovies);
     }
 
+    /*
+    * 获取数据填充视图
+    *
+    * @param position：当前的PopularMovie类
+    * @param converView：当前传入的view
+    * @param parent：父容器视图
+    * */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        //获取摆放位置
-        PopularMoview popularMoview = getItem(position);
-
-        //如果视图存在则获取并添加到布局文件list_item_moview中
         if (convertView == null){
-            convertView = LayoutInflater.from(getContext()).inflate(R.layout.list_item_moview, parent, false);
+            convertView = LayoutInflater.from(getContext()).inflate(R.layout.gridview_item, parent, false);
         }
 
-        //获取图片资源并填充到布局文件的视图中
-        ImageView posterView = (ImageView) convertView.findViewById(R.id.list_item_poster);
-        posterView.setImageResource(popularMoview.image);
+        PopularMovie popularMovie = getItem(position);
+
+        ImageView posterView = (ImageView) convertView.findViewById(R.id.poster_item);
+        posterView.setImageResource(popularMovie.getImage());
 
         return convertView;
     }
