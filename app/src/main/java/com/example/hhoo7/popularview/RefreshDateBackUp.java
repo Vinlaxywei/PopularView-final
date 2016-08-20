@@ -10,8 +10,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class RefreshDate extends AsyncTask {
-    private String LOG_TAG = RefreshDate.class.getSimpleName();
+public class RefreshDateBackUp extends AsyncTask {
+    private String LOG_TAG = RefreshDateBackUp.class.getSimpleName();
 
     @Override
     protected Object doInBackground(Object[] objects) {
