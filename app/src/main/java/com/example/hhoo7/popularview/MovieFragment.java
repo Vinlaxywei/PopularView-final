@@ -1,8 +1,11 @@
 package com.example.hhoo7.popularview;
 
 import android.app.Fragment;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -17,6 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -95,8 +99,19 @@ public class MovieFragment extends Fragment {
     }
 
     public void upData() {
-        RefreshDate getMovieDate = new RefreshDate();
-        getMovieDate.execute();
+        if (isOnline()) {
+            RefreshDate getMovieDate = new RefreshDate();
+            getMovieDate.execute();
+        } else {
+            Toast.makeText(getActivity(), "网络状态不好哦，建议查看联网状态并尝试刷新", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    public boolean isOnline() {
+        ConnectivityManager cm =
+                (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 
     public class RefreshDate extends AsyncTask<Void, Void, String[][]> {
@@ -224,7 +239,7 @@ public class MovieFragment extends Fragment {
                 resultStrs[i][4] = releaseDate;
             }
 
-            Log.d("提取数据预览", resultStrs[0][0] + " + " + resultStrs[0][1] + "  " +resultStrs[0][3]+"  "+resultStrs[0][4]);
+            Log.d("提取数据预览", resultStrs[0][0] + " + " + resultStrs[0][1] + "  " + resultStrs[0][3] + "  " + resultStrs[0][4]);
             return resultStrs;
         }
 
