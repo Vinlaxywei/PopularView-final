@@ -224,7 +224,7 @@ public class MovieFragment extends Fragment {
                 resultStrs[i][4] = releaseDate;
             }
 
-            Log.d("提取数据预览", resultStrs[0][0] + " + " + resultStrs[0][1] + "剧情简介" +resultStrs[0][3]+resultStrs[0][4]);
+            Log.d("提取数据预览", resultStrs[0][0] + " + " + resultStrs[0][1] + "  " +resultStrs[0][3]+"  "+resultStrs[0][4]);
             return resultStrs;
         }
 

@@ -1,38 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
-    <ImageView
-        android:id="@+id/detail_poster_imageview"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/detail_title_textview"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        tools:text="电影名称" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
-    <TextView
-        android:id="@+id/detail_overview_textview"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        tools:text="简介" />
+            <ImageView
+                android:id="@+id/detail_poster_imageview"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
 
-    <TextView
-        android:id="@+id/detail_voteAverager_textview"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        tools:text="用户评分" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/detail_releaseDate_textview"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        tools:text="发布日期" />
+                <TextView
+                    android:id="@+id/detail_title_textview"
+                    style="@style/customText"
+                    tools:text="电影名称" />
 
+                <TextView
+                    android:id="@+id/detail_voteAverager_textview"
+                    style="@style/customText"
+                    android:textStyle="italic"
+                    tools:text="用户评分" />
 
-</LinearLayout>
+                <TextView
+                    android:id="@+id/detail_releaseDate_textview"
+                    style="@style/customText"
+                    android:textStyle="italic"
+                    tools:text="发布日期" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <TextView
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:id="@+id/detail_overview_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="简介" />
+
+    </LinearLayout>
+</ScrollView>

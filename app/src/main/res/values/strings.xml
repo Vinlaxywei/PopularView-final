@@ -26,6 +26,7 @@
     <string name="pref_movieSort_title">电影排序</string>
     <string name="pref_movieSort_key">movieSort</string>
     <string name="pref_movieSort_defalutValue">popular</string>
+    <string name="DetailActivitty_label">电影详情</string>
     <string-array name="pref_movieSort_options">
         <item>Top热门</item>
         <item>Top评分</item>
