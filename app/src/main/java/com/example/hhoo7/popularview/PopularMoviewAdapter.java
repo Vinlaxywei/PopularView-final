@@ -15,11 +15,11 @@ import java.util.ArrayList;
 * 自定义类，继承自ArrayAdapter
 * 用于加载PopularMovie类到GridView中
 * */
-public class PopularMoviewAdapter extends ArrayAdapter<String> {
+public class PopularMoviewAdapter extends ArrayAdapter<MovieData> {
     private static String LOG_TAG = PopularMoviewAdapter.class.getSimpleName();
 
-    public PopularMoviewAdapter(Activity context, ArrayList<String> popularMovies) {
-        super(context,0, popularMovies);
+    public PopularMoviewAdapter(Activity context, ArrayList<MovieData> movieDatas) {
+        super(context,0, movieDatas);
     }
 
     /*
@@ -35,9 +35,9 @@ public class PopularMoviewAdapter extends ArrayAdapter<String> {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.gridview_item, parent, false);
         }
 
-        String posterUri = getItem(position);
+        MovieData movieData = getItem(position);
         ImageView posterView = (ImageView) convertView.findViewById(R.id.poster_imageview);
-        loadPoster(posterUri,posterView);
+        loadPoster(movieData.getPosterUri(),posterView);
 
         return convertView;
     }

@@ -15,6 +15,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.GridView;
 
 import org.json.JSONArray;
@@ -54,7 +55,7 @@ public class MovieFragment extends Fragment {
                 upData();
                 return true;
             case R.id.action_setting:
-                startActivity(new Intent(getActivity(),SettingsActivity.class));
+                startActivity(new Intent(getActivity(), SettingsActivity.class));
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -62,13 +63,27 @@ public class MovieFragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mArrayAdapter = new PopularMoviewAdapter(getActivity(), new ArrayList<String>());
+    public View onCreateView(final LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        mArrayAdapter = new PopularMoviewAdapter(getActivity(), new ArrayList<MovieData>());
 
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
         GridView gridView = (GridView) rootView.findViewById(R.id.movie_gridview);
         gridView.setAdapter(mArrayAdapter);
+
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Intent intent = new Intent(getActivity(), DetailActivity.class);
+                intent.putExtra("poster", mArrayAdapter.getItem(i).getPosterUri());
+                intent.putExtra("title", mArrayAdapter.getItem(i).getMovieTitle());
+                intent.putExtra("overView", mArrayAdapter.getItem(i).getOverView());
+                intent.putExtra("voteAverage", mArrayAdapter.getItem(i).getVoteAverage());
+                intent.putExtra("releaseDate", mArrayAdapter.getItem(i).getReleaseDate());
+                Log.d(LOG_TAG, "pu data: " + mArrayAdapter.getItem(i).toString());
+                startActivity(intent);
+            }
+        });
 
         return rootView;
     }
@@ -84,7 +99,7 @@ public class MovieFragment extends Fragment {
         getMovieDate.execute();
     }
 
-    public class RefreshDate extends AsyncTask<Void, Void, String[]> {
+    public class RefreshDate extends AsyncTask<Void, Void, String[][]> {
         private String LOG_TAG = RefreshDate.class.getSimpleName();
         private String movieJsonStr;
         private String mode;
@@ -92,7 +107,7 @@ public class MovieFragment extends Fragment {
         private String language;
 
         @Override
-        protected String[] doInBackground(Void... voids) {
+        protected String[][] doInBackground(Void... voids) {
             // These two need to be declared outside the try/catch
             // so that they can be closed in the finally block.
             HttpURLConnection urlConnection = null;
@@ -101,9 +116,9 @@ public class MovieFragment extends Fragment {
             movieJsonStr = null;
 
             SharedPreferences mPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
-            mode = mPref.getString(getString(R.string.pref_movieSort_key),getString(R.string.pref_movieSort_defalutValue));
+            mode = mPref.getString(getString(R.string.pref_movieSort_key), getString(R.string.pref_movieSort_defalutValue));
             page = 1;
-            language = mPref.getString(getString(R.string.pref_language_key),getString(R.string.pref_language_defalutValue));
+            language = mPref.getString(getString(R.string.pref_language_key), getString(R.string.pref_language_defalutValue));
 
             try {
 //                String baseUrl = "http://api.themoviedb.org/3/movie/popular?api_key="+BuildConfig.TheMovieDb_Key+"&page=2&language=zh";
@@ -120,7 +135,7 @@ public class MovieFragment extends Fragment {
                         .build();
 
                 URL url = new URL(builtUri.toString());
-                Log.d(LOG_TAG,"URL: "+ url);
+                Log.d(LOG_TAG, "URL: " + url);
 
                 // Create the request to the movie db, and open the connection
                 urlConnection = (HttpURLConnection) url.openConnection();
@@ -175,33 +190,55 @@ public class MovieFragment extends Fragment {
             return null;
         }
 
-        private String[] getMovieDataFromJson(String movieJsonStr) throws JSONException {
+        private String[][] getMovieDataFromJson(String movieJsonStr) throws JSONException {
             JSONObject movieData = new JSONObject(movieJsonStr);
             JSONArray resultArray = movieData.getJSONArray("results");
 
-            String[] resultStrs = new String[resultArray.length()];
-            String posterSize = "185";
+            String[][] resultStrs = new String[resultArray.length()][5];
+            final String posterSize = "185";
 
             for (int i = 0; i < resultArray.length(); i++) {
-                String posterPath = "http://image.tmdb.org/t/p/w"+posterSize;
+                String posterPath = "http://image.tmdb.org/t/p/w" + posterSize;
                 JSONObject movieDataInfo = resultArray.getJSONObject(i);
                 posterPath += movieDataInfo.getString("poster_path");
-                resultStrs[i] = posterPath;
+                resultStrs[i][0] = posterPath;
+
+                //解析电影名称
+                String movieTitle = movieDataInfo.getString("title");
+//                Log.d(LOG_TAG, "电影名称title：" + movieTitle);
+                resultStrs[i][1] = movieTitle;
+
+                //解析电影剧情简介
+                String movieOverView = movieDataInfo.getString("overview");
+//                Log.d(LOG_TAG, "电影剧情简介" +movieOverView);
+                resultStrs[i][2] = movieOverView;
+
+                //解析用户评分
+                String voteAverage = movieDataInfo.getString("vote_average");
+//                Log.d(LOG_TAG, "电影剧情简介" +voteAverage);
+                resultStrs[i][3] = voteAverage;
+
+                //解析发布日期
+                String releaseDate = movieDataInfo.getString("release_date");
+//                Log.d(LOG_TAG, "电影剧情简介" +releaseDate);
+                resultStrs[i][4] = releaseDate;
             }
 
-//            for (String s : resultStrs) {
-//                Log.d(LOG_TAG,"DATA: "+s);
-//            }
-            Log.d(LOG_TAG, "Poster Uri got it : " + resultStrs[0]);
+            Log.d("提取数据预览", resultStrs[0][0] + " + " + resultStrs[0][1] + "剧情简介" +resultStrs[0][3]+resultStrs[0][4]);
             return resultStrs;
         }
 
         @Override
-        protected void onPostExecute(String[] strings) {
-            if (strings != null) {
+        protected void onPostExecute(String[][] resultStrs) {
+            if (resultStrs != null) {
                 mArrayAdapter.clear();
-                for (String s : strings) {
-                    mArrayAdapter.add(s);
+                for (int i = 0; i < resultStrs.length; i++) {
+                    mArrayAdapter.add(new MovieData(
+                            resultStrs[i][0],
+                            resultStrs[i][1],
+                            resultStrs[i][2],
+                            resultStrs[i][3],
+                            resultStrs[i][4]));
                 }
             }
         }
