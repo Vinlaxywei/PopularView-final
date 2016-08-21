@@ -36,8 +36,11 @@ import java.util.ArrayList;
 
 public class MovieFragment extends Fragment {
     private String LOG_TAG = MovieFragment.class.getSimpleName();
-    PopularMoviewAdapter mArrayAdapter;
+    movieDataAdapter mMovieDataAdapter;
 
+    /*
+    * 构造函数
+    * */
     public MovieFragment() {
     }
 
@@ -47,17 +50,26 @@ public class MovieFragment extends Fragment {
         setHasOptionsMenu(true);
     }
 
+    /*
+    * 调用菜单文件
+    * */
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_main, menu);
     }
 
+    /*
+    * 设置菜单选项的触发事件
+    * */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            //刷新按钮：启动AsyncTask，更新数据及视图
             case R.id.action_refresh:
                 upData();
                 return true;
+
+            //设置按钮：跳转到设置界面
             case R.id.action_setting:
                 startActivity(new Intent(getActivity(), SettingsActivity.class));
                 return true;
@@ -68,23 +80,29 @@ public class MovieFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(final LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mArrayAdapter = new PopularMoviewAdapter(getActivity(), new ArrayList<MovieData>());
+        //实例化mArrayAdapter
+        mMovieDataAdapter = new movieDataAdapter(getActivity(), new ArrayList<MovieData>());
 
+        /*
+        * 调用GridView，绑定适配器
+        * */
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-
         GridView gridView = (GridView) rootView.findViewById(R.id.movie_gridview);
-        gridView.setAdapter(mArrayAdapter);
+        gridView.setAdapter(mMovieDataAdapter);
 
+        /*
+        * GridView设置点击监听器，触发后传递解析后的电影相关信息，并调转到电影详情界面
+        * */
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Intent intent = new Intent(getActivity(), DetailActivity.class);
-                intent.putExtra("poster", mArrayAdapter.getItem(i).getPosterUri());
-                intent.putExtra("title", mArrayAdapter.getItem(i).getMovieTitle());
-                intent.putExtra("overView", mArrayAdapter.getItem(i).getOverView());
-                intent.putExtra("voteAverage", mArrayAdapter.getItem(i).getVoteAverage());
-                intent.putExtra("releaseDate", mArrayAdapter.getItem(i).getReleaseDate());
-                Log.d(LOG_TAG, "pu data: " + mArrayAdapter.getItem(i).toString());
+                intent.putExtra("poster", mMovieDataAdapter.getItem(i).getPosterUri());
+                intent.putExtra("title", mMovieDataAdapter.getItem(i).getMovieTitle());
+                intent.putExtra("overView", mMovieDataAdapter.getItem(i).getOverView());
+                intent.putExtra("voteAverage", mMovieDataAdapter.getItem(i).getVoteAverage());
+                intent.putExtra("releaseDate", mMovieDataAdapter.getItem(i).getReleaseDate());
+                Log.d(LOG_TAG, "pu data: " + mMovieDataAdapter.getItem(i).toString());
                 startActivity(intent);
             }
         });
@@ -92,12 +110,19 @@ public class MovieFragment extends Fragment {
         return rootView;
     }
 
+    /*
+    * 启动时更新视图，不过有时会没有响应，不知道是不是墙的原因
+    * */
     @Override
     public void onStart() {
         super.onStart();
         upData();
     }
 
+    /*
+    * 将更新数据的具体细节封装成一个函数。
+    * if判断：调用检查网络的方法，检查设备网络状况，无网络时弹出提示
+    * */
     public void upData() {
         if (isOnline()) {
             RefreshDate getMovieDate = new RefreshDate();
@@ -107,6 +132,9 @@ public class MovieFragment extends Fragment {
         }
     }
 
+    /*
+    * @return 设备网络情况
+    * */
     public boolean isOnline() {
         ConnectivityManager cm =
                 (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -114,13 +142,28 @@ public class MovieFragment extends Fragment {
         return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 
+    /*
+    * 此函数继承自AsyncTask，用于后台发送URL请求，并对返回的json进行解析
+    * 将解析后的电影信息储存在一个二维数组
+    * */
     public class RefreshDate extends AsyncTask<Void, Void, String[][]> {
+        /*
+        * @param movieJsonStr：api提供商服务器返回的json字符串数据
+        * @param mode：电影清单类型
+        * @param page：电影页数
+        * @param language：电影信息的语言
+        * */
         private String LOG_TAG = RefreshDate.class.getSimpleName();
         private String movieJsonStr;
         private String mode;
         private int page;
         private String language;
 
+
+        /*
+        * 后台任务：发送URL到Api提供商
+        * @return 返回一个String类型的二维数组，存放有电影信息，用于更新视图
+        * */
         @Override
         protected String[][] doInBackground(Void... voids) {
             // These two need to be declared outside the try/catch
@@ -128,16 +171,23 @@ public class MovieFragment extends Fragment {
             HttpURLConnection urlConnection = null;
             BufferedReader reader = null;
 
+            //清空存放json的对象，避免数据混淆
             movieJsonStr = null;
 
+            //定义SharePreferences的对象，Call：mPref。用于读取设置选项的数据
             SharedPreferences mPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            //获取电影清单类型
             mode = mPref.getString(getString(R.string.pref_movieSort_key), getString(R.string.pref_movieSort_defalutValue));
             page = 1;
+            //获取电影信息语言
             language = mPref.getString(getString(R.string.pref_language_key), getString(R.string.pref_language_defalutValue));
 
             try {
 //                String baseUrl = "http://api.themoviedb.org/3/movie/popular?api_key="+BuildConfig.TheMovieDb_Key+"&page=2&language=zh";
 
+                /*
+                * 构建基础URL
+                * */
                 final String BASE_URL = "http://api.themoviedb.org/3/movie/" + mode + "?";
                 final String APIKEY_PARAM = "api_key";
                 final String PAGE_PARAM = "page";
@@ -150,9 +200,9 @@ public class MovieFragment extends Fragment {
                         .build();
 
                 URL url = new URL(builtUri.toString());
-                Log.d(LOG_TAG, "URL: " + url);
+                Log.d(LOG_TAG, "发送请求的URL: " + url);
 
-                // Create the request to the movie db, and open the connection
+                //发送请求
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
                 urlConnection.connect();
@@ -196,8 +246,12 @@ public class MovieFragment extends Fragment {
                     }
                 }
             }
-//            Log.d(LOG_TAG, "data:+" + movieJsonStr);
+//            Log.d(LOG_TAG, "Data:+" + movieJsonStr);
             try {
+                /*
+                * 调用函数解析服务器返回的Json数据，并提取电影信息。
+                * @return 返回一个String类型的二维数组，存放有电影信息
+                * */
                 return getMovieDataFromJson(movieJsonStr);
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -205,37 +259,44 @@ public class MovieFragment extends Fragment {
             return null;
         }
 
+        /*
+        * 自定义函数：用于解析json，提取信息
+        * */
         private String[][] getMovieDataFromJson(String movieJsonStr) throws JSONException {
+            //提取整个json字符串
             JSONObject movieData = new JSONObject(movieJsonStr);
+            //提取json字符串中的列表
             JSONArray resultArray = movieData.getJSONArray("results");
 
+            //定义一个String类型的二维数组，用于存放电影信息
             String[][] resultStrs = new String[resultArray.length()][5];
+            //电影海报的尺寸包括w154、w185、w342、w500、w780、original。这里使用适合大多数手机的尺寸：w185
             final String posterSize = "185";
 
+            //用一个遍历把json列表中的电影数据提取出来，
             for (int i = 0; i < resultArray.length(); i++) {
-                String posterPath = "http://image.tmdb.org/t/p/w" + posterSize;
+                //提取列表index
                 JSONObject movieDataInfo = resultArray.getJSONObject(i);
+
+                //解析提取电影海报uri
+                String posterPath = "http://image.tmdb.org/t/p/w" + posterSize;
                 posterPath += movieDataInfo.getString("poster_path");
                 resultStrs[i][0] = posterPath;
 
-                //解析电影名称
+                //解析提取电影名称
                 String movieTitle = movieDataInfo.getString("title");
-//                Log.d(LOG_TAG, "电影名称title：" + movieTitle);
                 resultStrs[i][1] = movieTitle;
 
-                //解析电影剧情简介
+                //解析提取电影剧情简介
                 String movieOverView = movieDataInfo.getString("overview");
-//                Log.d(LOG_TAG, "电影剧情简介" +movieOverView);
                 resultStrs[i][2] = movieOverView;
 
-                //解析用户评分
+                //解析提取用户评分
                 String voteAverage = movieDataInfo.getString("vote_average");
-//                Log.d(LOG_TAG, "电影剧情简介" +voteAverage);
                 resultStrs[i][3] = voteAverage;
 
-                //解析发布日期
+                //解析提取发布日期
                 String releaseDate = movieDataInfo.getString("release_date");
-//                Log.d(LOG_TAG, "电影剧情简介" +releaseDate);
                 resultStrs[i][4] = releaseDate;
             }
 
@@ -245,10 +306,13 @@ public class MovieFragment extends Fragment {
 
         @Override
         protected void onPostExecute(String[][] resultStrs) {
+            //检查数组是否为空
             if (resultStrs != null) {
-                mArrayAdapter.clear();
+                //清空数组，避免数据混淆
+                mMovieDataAdapter.clear();
+                //使用一个遍历将电影信息添加到自定义的适配器，适配器将用其更新视图
                 for (int i = 0; i < resultStrs.length; i++) {
-                    mArrayAdapter.add(new MovieData(
+                    mMovieDataAdapter.add(new MovieData(
                             resultStrs[i][0],
                             resultStrs[i][1],
                             resultStrs[i][2],

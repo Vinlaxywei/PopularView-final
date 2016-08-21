@@ -1,10 +1,10 @@
 <resources>
     <string name="app_name">PopularView</string>
-    <string name="action_setting">Setting</string>
-    <string name="action_refresh">Refresh</string>
+    <string name="action_setting">设置</string>
+    <string name="action_refresh">刷新</string>
     <string name="title_activity_settings">Settings</string>
 
-    <!--字符串：设置菜单-->
+    <!--设置菜单用到的字符串-->
     <!--语言选项-->
     <string name="pref_language_title">Language</string>
     <string name="pref_language_key">language</string>
@@ -22,14 +22,14 @@
         <item>io</item>
     </string-array>
 
-    <!--热门or评分选项-->
+    <!--电影排序选项-->
     <string name="pref_movieSort_title">电影排序</string>
     <string name="pref_movieSort_key">movieSort</string>
     <string name="pref_movieSort_defalutValue">popular</string>
     <string name="DetailActivitty_label">电影详情</string>
     <string-array name="pref_movieSort_options">
-        <item>Top热门</item>
-        <item>Top评分</item>
+        <item>最受欢迎</item>
+        <item>评分最高</item>
     </string-array>
     <string-array name="pref_movieSort_values">
         <item>popular</item>

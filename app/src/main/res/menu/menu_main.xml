@@ -2,14 +2,16 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <!--设置选项-->
     <item
         android:id="@+id/action_setting"
         android:title="@string/action_setting"
         app:showAsAction="never" />
 
+    <!--刷新选项-->
     <item
         android:id="@+id/action_refresh"
-        android:title="Refresh"
+        android:title="@string/action_refresh"
         app:showAsAction="never" />
 
 </menu>

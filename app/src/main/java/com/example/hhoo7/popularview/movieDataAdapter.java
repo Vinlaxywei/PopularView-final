@@ -13,19 +13,18 @@ import java.util.ArrayList;
 
 /*
 * 自定义类，继承自ArrayAdapter
-* 用于加载PopularMovie类到GridView中
 * */
-public class PopularMoviewAdapter extends ArrayAdapter<MovieData> {
-    private static String LOG_TAG = PopularMoviewAdapter.class.getSimpleName();
+public class movieDataAdapter extends ArrayAdapter<MovieData> {
+    private static String LOG_TAG = movieDataAdapter.class.getSimpleName();
 
-    public PopularMoviewAdapter(Activity context, ArrayList<MovieData> movieDatas) {
+    public movieDataAdapter(Activity context, ArrayList<MovieData> movieDatas) {
         super(context,0, movieDatas);
     }
 
     /*
     * 获取数据填充视图
     *
-    * @param position：当前的PopularMovie类
+    * @param position：当前的MovieData对象
     * @param converView：当前传入的view
     * @param parent：父容器视图
     * */
@@ -35,13 +34,16 @@ public class PopularMoviewAdapter extends ArrayAdapter<MovieData> {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.gridview_item, parent, false);
         }
 
+        //获取当前MovieData对象
         MovieData movieData = getItem(position);
         ImageView posterView = (ImageView) convertView.findViewById(R.id.poster_imageview);
+        //调用函数加载图片到视图上
         loadPoster(movieData.getPosterUri(),posterView);
 
         return convertView;
     }
 
+    //自定义函数，调用第三方库Picasso，用于解析图片，并加载到ImageView中
     private void loadPoster(String posterUri, ImageView currentView) {
         Picasso.with(getContext()).load(posterUri).into(currentView);
     }

@@ -1,9 +1,16 @@
 package com.example.hhoo7.popularview;
 
 /*
-* 自定义类.
+* 自定义类，存放电影信息
 * */
 public class MovieData {
+    /*
+    * @param posterUri：电影海报uri
+    * @param movieTitle：电影名称
+    * @param overView：剧情简介
+    * @param voteAverage：电影评分
+    * @param releaseDate：发布日期
+    * */
     private String posterUri;
     private String movieTitle;
     private String overView;
