@@ -1,9 +1,12 @@
 package com.example.hhoo7.popularview;
 
 import android.app.Fragment;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -50,6 +53,9 @@ public class MovieFragment extends Fragment {
             case R.id.action_refresh:
                 upData();
                 return true;
+            case R.id.action_setting:
+                startActivity(new Intent(getActivity(),SettingsActivity.class));
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -93,9 +99,11 @@ public class MovieFragment extends Fragment {
             BufferedReader reader = null;
 
             movieJsonStr = null;
-            mode = "popular";
+
+            SharedPreferences mPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            mode = mPref.getString(getString(R.string.pref_movieSort_key),getString(R.string.pref_movieSort_defalutValue));
             page = 1;
-            language = "en";
+            language = mPref.getString(getString(R.string.pref_language_key),getString(R.string.pref_language_defalutValue));
 
             try {
 //                String baseUrl = "http://api.themoviedb.org/3/movie/popular?api_key="+BuildConfig.TheMovieDb_Key+"&page=2&language=zh";
@@ -112,6 +120,7 @@ public class MovieFragment extends Fragment {
                         .build();
 
                 URL url = new URL(builtUri.toString());
+                Log.d(LOG_TAG,"URL: "+ url);
 
                 // Create the request to the movie db, and open the connection
                 urlConnection = (HttpURLConnection) url.openConnection();
@@ -171,9 +180,10 @@ public class MovieFragment extends Fragment {
             JSONArray resultArray = movieData.getJSONArray("results");
 
             String[] resultStrs = new String[resultArray.length()];
+            String posterSize = "185";
 
             for (int i = 0; i < resultArray.length(); i++) {
-                String posterPath = "http://image.tmdb.org/t/p/w185";
+                String posterPath = "http://image.tmdb.org/t/p/w"+posterSize;
                 JSONObject movieDataInfo = resultArray.getJSONObject(i);
                 posterPath += movieDataInfo.getString("poster_path");
                 resultStrs[i] = posterPath;

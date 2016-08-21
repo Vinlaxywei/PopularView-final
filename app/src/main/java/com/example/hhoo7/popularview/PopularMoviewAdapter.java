@@ -36,7 +36,7 @@ public class PopularMoviewAdapter extends ArrayAdapter<String> {
         }
 
         String posterUri = getItem(position);
-        ImageView posterView = (ImageView) convertView.findViewById(R.id.item_image);
+        ImageView posterView = (ImageView) convertView.findViewById(R.id.poster_imageview);
         loadPoster(posterUri,posterView);
 
         return convertView;

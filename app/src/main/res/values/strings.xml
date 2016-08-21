@@ -1,4 +1,37 @@
 <resources>
     <string name="app_name">PopularView</string>
     <string name="action_setting">Setting</string>
+    <string name="action_refresh">Refresh</string>
+    <string name="title_activity_settings">Settings</string>
+
+    <!--字符串：设置菜单-->
+    <!--语言选项-->
+    <string name="pref_language_title">Language</string>
+    <string name="pref_language_key">language</string>
+    <string name="pref_language_defalutValue">en</string>
+    <string-array name="pref_language_options">
+        <item>英语</item>
+        <item>汉语</item>
+        <item>日语</item>
+        <item>世界语</item>
+    </string-array>
+    <string-array name="pref_language_values">
+        <item>en</item>
+        <item>zh</item>
+        <item>ja</item>
+        <item>io</item>
+    </string-array>
+
+    <!--热门or评分选项-->
+    <string name="pref_movieSort_title">电影排序</string>
+    <string name="pref_movieSort_key">movieSort</string>
+    <string name="pref_movieSort_defalutValue">popular</string>
+    <string-array name="pref_movieSort_options">
+        <item>Top热门</item>
+        <item>Top评分</item>
+    </string-array>
+    <string-array name="pref_movieSort_values">
+        <item>popular</item>
+        <item>top_rated</item>
+    </string-array>
 </resources>
