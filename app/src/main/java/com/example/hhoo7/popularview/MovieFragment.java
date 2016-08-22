@@ -97,12 +97,8 @@ public class MovieFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Intent intent = new Intent(getActivity(), DetailActivity.class);
-                intent.putExtra("poster", mMovieDataAdapter.getItem(i).getPosterUri());
-                intent.putExtra("title", mMovieDataAdapter.getItem(i).getMovieTitle());
-                intent.putExtra("overView", mMovieDataAdapter.getItem(i).getOverView());
-                intent.putExtra("voteAverage", mMovieDataAdapter.getItem(i).getVoteAverage());
-                intent.putExtra("releaseDate", mMovieDataAdapter.getItem(i).getReleaseDate());
-                Log.d(LOG_TAG, "pu data: " + mMovieDataAdapter.getItem(i).toString());
+                intent.putExtra("movieData",mMovieDataAdapter.getItem(i));
+//                Log.d(LOG_TAG, "传递数据预览: " + mMovieDataAdapter.getItem(i).toString());
                 startActivity(intent);
             }
         });
@@ -128,7 +124,10 @@ public class MovieFragment extends Fragment {
             RefreshDate getMovieDate = new RefreshDate();
             getMovieDate.execute();
         } else {
-            Toast.makeText(getActivity(), "网络状态不好哦，建议查看联网状态并尝试刷新", Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(),
+                    R.string.toast_display_offOline,
+                    Toast.LENGTH_LONG)
+                    .show();
         }
     }
 
@@ -271,7 +270,7 @@ public class MovieFragment extends Fragment {
             //定义一个String类型的二维数组，用于存放电影信息
             String[][] resultStrs = new String[resultArray.length()][5];
             //电影海报的尺寸包括w154、w185、w342、w500、w780、original。这里使用适合大多数手机的尺寸：w185
-            final String posterSize = "185";
+            final String posterSize = "500";
 
             //用一个遍历把json列表中的电影数据提取出来，
             for (int i = 0; i < resultArray.length(); i++) {
@@ -280,24 +279,44 @@ public class MovieFragment extends Fragment {
 
                 //解析提取电影海报uri
                 String posterPath = "http://image.tmdb.org/t/p/w" + posterSize;
-                posterPath += movieDataInfo.getString("poster_path");
-                resultStrs[i][0] = posterPath;
+                if (movieDataInfo.isNull("poster_path")) {
+                    Log.d(LOG_TAG, "poster_path is null");
+                }else {
+                    posterPath += movieDataInfo.getString("poster_path");
+                    resultStrs[i][0] = posterPath;
+                }
 
                 //解析提取电影名称
-                String movieTitle = movieDataInfo.getString("title");
-                resultStrs[i][1] = movieTitle;
+                if (movieDataInfo.isNull("title")) {
+                    Log.d(LOG_TAG, "title is null");
+                }else {
+                    String movieTitle = movieDataInfo.getString("title");
+                    resultStrs[i][1] = movieTitle;
+                }
 
                 //解析提取电影剧情简介
-                String movieOverView = movieDataInfo.getString("overview");
-                resultStrs[i][2] = movieOverView;
+                if (movieDataInfo.isNull("overview")) {
+                    Log.d(LOG_TAG, "overview is null");
+                }else {
+                    String movieOverView = movieDataInfo.getString("overview");
+                    resultStrs[i][2] = movieOverView;
+                }
 
                 //解析提取用户评分
-                String voteAverage = movieDataInfo.getString("vote_average");
-                resultStrs[i][3] = voteAverage;
+                if (movieDataInfo.isNull("vote_average")) {
+                    Log.d(LOG_TAG, "vote_average is null");
+                }else {
+                    String voteAverage = movieDataInfo.getString("vote_average");
+                    resultStrs[i][3] = voteAverage;
+                }
 
                 //解析提取发布日期
-                String releaseDate = movieDataInfo.getString("release_date");
-                resultStrs[i][4] = releaseDate;
+                if (movieDataInfo.isNull("release_date")) {
+                    Log.d(LOG_TAG, "release_date is null");
+                }else {
+                    String releaseDate = movieDataInfo.getString("release_date");
+                    resultStrs[i][4] = releaseDate;
+                }
             }
 
             Log.d("提取数据预览", resultStrs[0][0] + " + " + resultStrs[0][1] + "  " + resultStrs[0][3] + "  " + resultStrs[0][4]);

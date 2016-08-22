@@ -45,6 +45,11 @@ public class movieDataAdapter extends ArrayAdapter<MovieData> {
 
     //自定义函数，调用第三方库Picasso，用于解析图片，并加载到ImageView中
     private void loadPoster(String posterUri, ImageView currentView) {
-        Picasso.with(getContext()).load(posterUri).into(currentView);
+        Picasso.with(getContext()).load(posterUri)
+                //如果图片正在下载，将会显示这张图片
+                .placeholder(R.drawable.im_loading)
+                //如果图片下载失败，将会显示这张图片
+                .error(R.drawable.im_error)
+                .into(currentView);
     }
 }

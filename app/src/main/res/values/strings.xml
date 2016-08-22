@@ -27,6 +27,7 @@
     <string name="pref_movieSort_key">movieSort</string>
     <string name="pref_movieSort_defalutValue">popular</string>
     <string name="DetailActivitty_label">电影详情</string>
+    <string name="toast_display_offOline">网络状态不好哦，建议查看联网状态并尝试刷新</string>
     <string-array name="pref_movieSort_options">
         <item>最受欢迎</item>
         <item>评分最高</item>
@@ -35,4 +36,10 @@
         <item>popular</item>
         <item>top_rated</item>
     </string-array>
+
+    <!--fragment_detail中的tools:text-->
+    <string name="detail_title_text">电影名称</string>
+    <string name="detail_vote_text">用户评分</string>
+    <string name="detail_release_text">发布日期</string>
+    <string name="detail_overview_text">简介</string>
 </resources>

@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 
+<!--电影排序列数可考虑开放给用户自行设定-->
 <GridView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/movie_gridview"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:columnWidth="150dp"
-    android:horizontalSpacing="0dp"
-    android:numColumns="auto_fit"
-    android:verticalSpacing="0dp">
+    android:numColumns="auto_fit">
 
 </GridView>
 

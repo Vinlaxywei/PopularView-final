@@ -1,9 +1,11 @@
 package com.example.hhoo7.popularview;
 
+import java.io.Serializable;
+
 /*
 * 自定义类，存放电影信息
 * */
-public class MovieData {
+public class MovieData implements Serializable{
     /*
     * @param posterUri：电影海报uri
     * @param movieTitle：电影名称

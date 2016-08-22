@@ -41,36 +41,42 @@ public class DetailActivity extends AppCompatActivity {
         public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
             //定义Intent对象，用于获取传入的数据
             Intent intent = getActivity().getIntent();
+            MovieData movieData = (MovieData) intent.getSerializableExtra("movieData");
 
             View rootView = inflater.inflate(R.layout.fragment_detail,container,false);
 
             //调用函数加载图片到视图上
             ImageView posterImage = (ImageView) rootView.findViewById(R.id.detail_poster_imageview);
-            String posterPath = intent.getStringExtra("poster");
+            String posterPath = movieData.getPosterUri();
             loadPoster(posterPath,posterImage);
 
             //使用传入的信息加载到 电影名称
-            TextView titleText = (TextView) rootView.findViewById(R.id.detail_title_textview);
-            titleText.setText(intent.getStringExtra("title"));
+            TextView movieTitle = (TextView) rootView.findViewById(R.id.detail_title_textview);
+            movieTitle.setText(movieData.getMovieTitle());
 
             //使用传入的信息加载到 剧情简介
-            TextView overViewText = (TextView) rootView.findViewById(R.id.detail_overview_textview);
-            overViewText.setText(intent.getStringExtra("overView"));
+            TextView overView = (TextView) rootView.findViewById(R.id.detail_overview_textview);
+            overView.setText(movieData.getOverView());
 
             //使用传入的信息加载到 电影评分
             TextView voteAverage = (TextView) rootView.findViewById(R.id.detail_voteAverager_textview);
-            voteAverage.setText(intent.getStringExtra("voteAverage"));
+            voteAverage.setText(movieData.getVoteAverage());
 
             //使用传入的信息加载到 电影发布日期
             TextView releaseDate = (TextView) rootView.findViewById(R.id.detail_releaseDate_textview);
-            releaseDate.setText(intent.getStringExtra("releaseDate"));
+            releaseDate.setText(movieData.getReleaseDate());
 
             return rootView;
         }
 
         //自定义函数，调用第三方库Picasso，用于解析图片，并加载到ImageView中
         private void loadPoster(String posterUri, ImageView currentView) {
-            Picasso.with(getActivity().getBaseContext()).load(posterUri).into(currentView);
+            Picasso.with(getActivity().getBaseContext()).load(posterUri)
+                    //如果图片正在下载，将会显示这张图片
+                    .placeholder(R.drawable.im_loading)
+                    //如果图片下载失败，将会显示这张图片
+                    .error(R.drawable.im_error)
+                    .into(currentView);
         }
 
     }

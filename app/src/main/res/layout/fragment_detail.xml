@@ -24,24 +24,28 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
                 android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/detail_title_textview"
                     style="@style/customText"
-                    tools:text="电影名称" />
+                    android:textStyle="bold"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    tools:text="@string/detail_title_text" />
 
                 <TextView
                     android:id="@+id/detail_voteAverager_textview"
                     style="@style/customText"
                     android:textStyle="italic"
-                    tools:text="用户评分" />
+                    tools:text="@string/detail_vote_text" />
 
                 <TextView
                     android:id="@+id/detail_releaseDate_textview"
                     style="@style/customText"
                     android:textStyle="italic"
-                    tools:text="发布日期" />
+                    tools:text="@string/detail_release_text" />
 
             </LinearLayout>
         </LinearLayout>
@@ -51,7 +55,7 @@
             android:id="@+id/detail_overview_textview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            tools:text="简介" />
+            tools:text="@string/detail_overview_text" />
 
     </LinearLayout>
 </ScrollView>
