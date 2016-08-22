@@ -15,4 +15,11 @@
         android:key="@string/pref_movieSort_key"
         android:title="@string/pref_movieSort_title" />
 
+    <ListPreference
+        android:defaultValue="@string/pref_posterSize_defalutValue"
+        android:entries="@array/pref_posterSize_options"
+        android:entryValues="@array/pref_posterSize_values"
+        android:key="@string/pref_posterSize_key"
+        android:title="@string/pref_posterSize_title" />
+
 </PreferenceScreen>

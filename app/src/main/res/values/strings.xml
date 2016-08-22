@@ -3,6 +3,8 @@
     <string name="action_setting">设置</string>
     <string name="action_refresh">刷新</string>
     <string name="title_activity_settings">Settings</string>
+    <string name="DetailActivitty_label">电影详情</string>
+    <string name="toast_display_offOline">网络状态不好哦，建议查看联网状态并尝试刷新</string>
 
     <!--设置菜单用到的字符串-->
     <!--语言选项-->
@@ -26,8 +28,6 @@
     <string name="pref_movieSort_title">电影排序</string>
     <string name="pref_movieSort_key">movieSort</string>
     <string name="pref_movieSort_defalutValue">popular</string>
-    <string name="DetailActivitty_label">电影详情</string>
-    <string name="toast_display_offOline">网络状态不好哦，建议查看联网状态并尝试刷新</string>
     <string-array name="pref_movieSort_options">
         <item>最受欢迎</item>
         <item>评分最高</item>
@@ -35,6 +35,23 @@
     <string-array name="pref_movieSort_values">
         <item>popular</item>
         <item>top_rated</item>
+    </string-array>
+
+    <!--电影海报尺寸选项-->
+    <string name="pref_posterSize_title">图片质量</string>
+    <string name="pref_posterSize_key">posterSize</string>
+    <string name="pref_posterSize_defalutValue">185</string>
+    <string-array name="pref_posterSize_options">
+        <item>标清</item>
+        <item>高清</item>
+        <item>超清</item>
+        <item>超高清</item>
+    </string-array>
+    <string-array name="pref_posterSize_values">
+        <item>185</item>
+        <item>342</item>
+        <item>500</item>
+        <item>780</item>
     </string-array>
 
     <!--fragment_detail中的tools:text-->

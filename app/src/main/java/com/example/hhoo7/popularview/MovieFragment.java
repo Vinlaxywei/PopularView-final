@@ -270,7 +270,8 @@ public class MovieFragment extends Fragment {
             //定义一个String类型的二维数组，用于存放电影信息
             String[][] resultStrs = new String[resultArray.length()][5];
             //电影海报的尺寸包括w154、w185、w342、w500、w780、original。这里使用适合大多数手机的尺寸：w185
-            final String posterSize = "500";
+            SharedPreferences posterSizePref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            String posterSize = posterSizePref.getString(getString(R.string.pref_posterSize_key),getString(R.string.pref_posterSize_defalutValue));
 
             //用一个遍历把json列表中的电影数据提取出来，
             for (int i = 0; i < resultArray.length(); i++) {

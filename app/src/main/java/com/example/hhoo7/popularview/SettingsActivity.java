@@ -20,6 +20,7 @@ public class SettingsActivity extends PreferenceActivity
         //绑定设置选项的key值
         bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_language_key)));
         bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_movieSort_key)));
+        bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_posterSize_key)));
     }
 
     /*
