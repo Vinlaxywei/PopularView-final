@@ -1,31 +1,40 @@
 package com.example.hhoo7.popularview;
 
-import android.content.ContentValues;
 import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+import android.widget.ImageView;
 
-import com.example.hhoo7.popularview.data.MovieContract;
-import com.example.hhoo7.popularview.data.MovieDbHelper;
+import com.squareup.picasso.Picasso;
 
-/**
- * Created by hhoo7 on 2016/8/29.
- */
 public class PublicMethod {
 
-    public static void testDB(Context context) {
-        MovieDbHelper dbHelper = new MovieDbHelper(context);
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
+    private static final String TAG = PublicMethod.class.getSimpleName();
 
-        ContentValues testValue = new ContentValues();
-        testValue.put(MovieContract.DetailEntry.COLUMN_MOVIE_TITLE, "SUPERMAN");
-        testValue.put(MovieContract.DetailEntry.COLUMN_POSTER_PATH, "posterpath");
-        testValue.put(MovieContract.DetailEntry.COLUMN_OVER_VIEW, "over view");
-        testValue.put(MovieContract.DetailEntry.COLUMN_VOTE_AVERAGE, 7.2);
-        testValue.put(MovieContract.DetailEntry.COLUMN_DATE, "2015-02-03");
-        testValue.put(MovieContract.DetailEntry.COLUMN_MOVIE_ID, 1233123);
-        testValue.put(MovieContract.DetailEntry.COLUMN_FAVORITE, 1);
 
-        long movieID = db.insert(MovieContract.DetailEntry.TABLE_NAME, null, testValue);
+    //自定义函数，调用第三方库Picasso，用于解析图片，并加载到ImageView中
+    public static void loadPicture(Context context, String posterUri, ImageView currentView) {
+        Picasso.with(context).load(posterUri)
+                //如果图片正在下载，将会显示这张图片
+                .placeholder(R.drawable.im_loading)
+                //如果图片下载失败，将会显示这张图片
+                .error(R.drawable.im_error)
+                .into(currentView);
+    }
+
+    //获取用户自定义的偏好
+    public static String getModePreference(Context context) {
+        SharedPreferences mPref = PreferenceManager.getDefaultSharedPreferences(context);
+        //获取电影清单类型
+        return mPref.getString(context.getString(R.string.pref_movieSort_key),
+                context.getString(R.string.pref_movieSort_defalutValue));
+    }
+
+    public static String getlanguagePreference(Context context) {
+        SharedPreferences mPref = PreferenceManager.getDefaultSharedPreferences(context);
+        //获取电影清单类型
+        return mPref.getString(context.getString(R.string.pref_language_key),
+                context.getString(R.string.pref_language_defalutValue));
     }
 
 }

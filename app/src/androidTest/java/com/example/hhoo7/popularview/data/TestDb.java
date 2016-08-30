@@ -9,6 +9,8 @@ import java.util.HashSet;
 
 public class TestDb extends AndroidTestCase {
 
+    private static final String LOG_TAG = "test";
+
     @Override
     protected void setUp() throws Exception {
         mContext.deleteDatabase(MovieDbHelper.DATABASE_NAME);
@@ -102,10 +104,10 @@ public class TestDb extends AndroidTestCase {
                 null
         );
         //检查数据正确性
-        assertTrue("数据库的游标移动失败",cursor.moveToFirst());
+        assertTrue("数据库的游标移动失败", cursor.moveToFirst());
 
         //调用公共方法检查数据内容
-        TestUtil.validateCurrentRecord("数据内容错误",cursor,testValue);
+        TestUtil.validateCurrentRecord("数据内容错误", cursor, testValue);
 
         //检查数据正确性
         assertFalse(cursor.moveToNext());
@@ -132,8 +134,9 @@ public class TestDb extends AndroidTestCase {
         testValue.put(MovieContract.DetailEntry.COLUMN_POSTER_PATH, "posterpath");
         testValue.put(MovieContract.DetailEntry.COLUMN_OVER_VIEW, "over view");
         testValue.put(MovieContract.DetailEntry.COLUMN_VOTE_AVERAGE, 7.2);
-        testValue.put(MovieContract.DetailEntry.COLUMN_DATE, "2015-02-03");
+        testValue.put(MovieContract.DetailEntry.COLUMN_RELEASE_DATE, "2015-02-03");
         testValue.put(MovieContract.DetailEntry.COLUMN_MOVIE_ID, 1233123);
+        testValue.put(MovieContract.DetailEntry.COLUMN_POPULARITY,30.222);
         testValue.put(MovieContract.DetailEntry.COLUMN_FAVORITE, 1);
 
         //插入测试内容到数据库，并获取行号

@@ -14,10 +14,10 @@ public class MovieContract {
         public static final String COLUMN_POSTER_PATH = "poster_path";
         public static final String COLUMN_OVER_VIEW = "over_view";
         public static final String COLUMN_VOTE_AVERAGE = "vote_average";
-        public static final String COLUMN_DATE = "date";
+        public static final String COLUMN_RELEASE_DATE = "date";
         public static final String COLUMN_MOVIE_ID = "movie_id";
+        public static final String COLUMN_POPULARITY = "popularity";
         public static final String COLUMN_FAVORITE = "favorite";
-
     }
 
     //预告片表格所需用到的字符串

@@ -14,7 +14,7 @@ import com.example.hhoo7.popularview.data.MovieContract.TrailerEntry;
 public class MovieDbHelper extends SQLiteOpenHelper {
 
     //数据库版本号
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 3;
     //数据库名称
     static final String DATABASE_NAME = "movie.db";
 
@@ -36,8 +36,9 @@ public class MovieDbHelper extends SQLiteOpenHelper {
                 + DetailEntry.COLUMN_POSTER_PATH + " TEXT NOT NULL, "
                 + DetailEntry.COLUMN_OVER_VIEW + " TEXT NOT NULL, "
                 + DetailEntry.COLUMN_VOTE_AVERAGE + " REAL NOT NULL, "
-                + DetailEntry.COLUMN_DATE + " TEXT NOT NULL, "
-                + DetailEntry.COLUMN_MOVIE_ID + " TEXT NOT NULL, "
+                + DetailEntry.COLUMN_RELEASE_DATE + " TEXT NOT NULL, "
+                + DetailEntry.COLUMN_MOVIE_ID + " INTEGER NOT NULL, "
+                + DetailEntry.COLUMN_POPULARITY + " REAL NOT NULL, "
                 + DetailEntry.COLUMN_FAVORITE + " BIT );";
 
         /*
