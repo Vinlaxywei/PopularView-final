@@ -1,9 +1,11 @@
 package com.example.hhoo7.popularview;
 
 import android.app.Fragment;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -21,6 +23,9 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.Toast;
+
+import com.example.hhoo7.popularview.data.MovieContract;
+import com.example.hhoo7.popularview.data.MovieDbHelper;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -48,6 +53,22 @@ public class MovieFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+
+        MovieDbHelper dbHelper = new MovieDbHelper(getActivity());
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        ContentValues testValue = new ContentValues();
+        testValue.put(MovieContract.DetailEntry.COLUMN_MOVIE_TITLE, "SUPERMAN");
+        testValue.put(MovieContract.DetailEntry.COLUMN_POSTER_PATH, "posterpath");
+        testValue.put(MovieContract.DetailEntry.COLUMN_OVER_VIEW, "over view");
+        testValue.put(MovieContract.DetailEntry.COLUMN_VOTE_AVERAGE, 7.2);
+        testValue.put(MovieContract.DetailEntry.COLUMN_DATE, "2015-02-03");
+        testValue.put(MovieContract.DetailEntry.COLUMN_MOVIE_ID, 1233123);
+        testValue.put(MovieContract.DetailEntry.COLUMN_FAVORITE, 1);
+
+        long movieID = db.insert(MovieContract.DetailEntry.TABLE_NAME, null, testValue);
+        Log.d("TAG", "数据库创建完成");
+
     }
 
     /*
@@ -96,10 +117,11 @@ public class MovieFragment extends Fragment {
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Intent intent = new Intent(getActivity(), DetailActivity.class);
-                intent.putExtra("movieData",mMovieDataAdapter.getItem(i));
-//                Log.d(LOG_TAG, "传递数据预览: " + mMovieDataAdapter.getItem(i).toString());
-                startActivity(intent);
+//                Intent intent = new Intent(getActivity(), DetailActivity.class);
+//                intent.putExtra("movieData",mMovieDataAdapter.getItem(i));
+//                startActivity(intent);
+
+
             }
         });
 
@@ -271,7 +293,7 @@ public class MovieFragment extends Fragment {
             String[][] resultStrs = new String[resultArray.length()][5];
             //电影海报的尺寸包括w154、w185、w342、w500、w780、original。这里使用适合大多数手机的尺寸：w185
             SharedPreferences posterSizePref = PreferenceManager.getDefaultSharedPreferences(getActivity());
-            String posterSize = posterSizePref.getString(getString(R.string.pref_posterSize_key),getString(R.string.pref_posterSize_defalutValue));
+            String posterSize = posterSizePref.getString(getString(R.string.pref_posterSize_key), getString(R.string.pref_posterSize_defalutValue));
 
             //用一个遍历把json列表中的电影数据提取出来，
             for (int i = 0; i < resultArray.length(); i++) {
@@ -282,7 +304,7 @@ public class MovieFragment extends Fragment {
                 String posterPath = "http://image.tmdb.org/t/p/w" + posterSize;
                 if (movieDataInfo.isNull("poster_path")) {
                     Log.d(LOG_TAG, "poster_path is null");
-                }else {
+                } else {
                     posterPath += movieDataInfo.getString("poster_path");
                     resultStrs[i][0] = posterPath;
                 }
@@ -290,7 +312,7 @@ public class MovieFragment extends Fragment {
                 //解析提取电影名称
                 if (movieDataInfo.isNull("title")) {
                     Log.d(LOG_TAG, "title is null");
-                }else {
+                } else {
                     String movieTitle = movieDataInfo.getString("title");
                     resultStrs[i][1] = movieTitle;
                 }
@@ -298,7 +320,7 @@ public class MovieFragment extends Fragment {
                 //解析提取电影剧情简介
                 if (movieDataInfo.isNull("overview")) {
                     Log.d(LOG_TAG, "overview is null");
-                }else {
+                } else {
                     String movieOverView = movieDataInfo.getString("overview");
                     resultStrs[i][2] = movieOverView;
                 }
@@ -306,7 +328,7 @@ public class MovieFragment extends Fragment {
                 //解析提取用户评分
                 if (movieDataInfo.isNull("vote_average")) {
                     Log.d(LOG_TAG, "vote_average is null");
-                }else {
+                } else {
                     String voteAverage = movieDataInfo.getString("vote_average");
                     resultStrs[i][3] = voteAverage;
                 }
@@ -314,7 +336,7 @@ public class MovieFragment extends Fragment {
                 //解析提取发布日期
                 if (movieDataInfo.isNull("release_date")) {
                     Log.d(LOG_TAG, "release_date is null");
-                }else {
+                } else {
                     String releaseDate = movieDataInfo.getString("release_date");
                     resultStrs[i][4] = releaseDate;
                 }
