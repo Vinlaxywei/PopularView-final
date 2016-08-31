@@ -30,11 +30,11 @@ public class PublicMethod {
                 context.getString(R.string.pref_movieSort_defalutValue));
     }
 
-    public static String getlanguagePreference(Context context) {
+    public static String getPosterSizePreference(Context context) {
         SharedPreferences mPref = PreferenceManager.getDefaultSharedPreferences(context);
         //获取电影清单类型
-        return mPref.getString(context.getString(R.string.pref_language_key),
-                context.getString(R.string.pref_language_defalutValue));
+        return mPref.getString(context.getString(R.string.pref_posterSize_key),
+                context.getString(R.string.pref_posterSize_defalutValue));
     }
 
 }

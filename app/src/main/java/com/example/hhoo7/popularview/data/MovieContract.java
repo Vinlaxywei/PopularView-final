@@ -18,23 +18,16 @@ public class MovieContract {
         public static final String COLUMN_MOVIE_ID = "movie_id";
         public static final String COLUMN_POPULARITY = "popularity";
         public static final String COLUMN_FAVORITE = "favorite";
+
+        public static final String COLUMN_REVIEW = "review";
+        public static final String COLUMN_TRAILERS_FOREIGN_KEY = "trailers";
     }
 
     //预告片表格所需用到的字符串
     public static final class TrailerEntry implements BaseColumns {
-        public static final String TABLE_NAME = "trailer";
-        public static final String COLUMN_MOVIEID_KEY = "movie_id";
-        public static final String COLUMN_YOUTUBE_KEY = "youtube_key";
-        public static final String COLUMN_TRAILER_TITLE = "trailer_title";
+        public static final String TABLE_NAME = "youtubetrailers";
+        public static final String COLUMN_KEY_ONE = "key_one";
+        public static final String COLUMN_KEY_TWO = "key_two";
     }
-
-    //评论表格所需用到的字符串
-//    public static final class ReviewEntry implements BaseColumns {
-//        public static final String TABLE_NAME = "review";
-//        public static final String COLUMN_MOVIEID_KEY = "movie_id";
-//        public static final String COLUMN_REVIEW_AUTHOR = "author";
-//        public static final String COLUMN_REVIEW_CONTENT = "content";
-//    }
-
 
 }

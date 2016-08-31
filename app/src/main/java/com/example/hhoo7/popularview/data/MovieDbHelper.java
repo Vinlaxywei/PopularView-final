@@ -5,7 +5,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.example.hhoo7.popularview.data.MovieContract.DetailEntry;
-import com.example.hhoo7.popularview.data.MovieContract.TrailerEntry;
 
 /*
 * 定义一个继承自SQLiteOpenHelper的子类，作为数据库。
@@ -14,7 +13,7 @@ import com.example.hhoo7.popularview.data.MovieContract.TrailerEntry;
 public class MovieDbHelper extends SQLiteOpenHelper {
 
     //数据库版本号
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 1;
     //数据库名称
     static final String DATABASE_NAME = "movie.db";
 
@@ -39,29 +38,32 @@ public class MovieDbHelper extends SQLiteOpenHelper {
                 + DetailEntry.COLUMN_RELEASE_DATE + " TEXT NOT NULL, "
                 + DetailEntry.COLUMN_MOVIE_ID + " INTEGER NOT NULL, "
                 + DetailEntry.COLUMN_POPULARITY + " REAL NOT NULL, "
-                + DetailEntry.COLUMN_FAVORITE + " BIT );";
+                + DetailEntry.COLUMN_FAVORITE + " BIT ); ";
+//                + DetailEntry.COLUMN_REVIEW + " TEXT, "
+//                + DetailEntry.COLUMN_TRAILERS_FOREIGN_KEY + " INTEGER NOT NULL, "
+
 
         /*
         * 创建一张存放Trailer的表格
         * */
-        final String SQL_CREATE_TRAILER_TABLE = "CREATE TABLE " + TrailerEntry.TABLE_NAME + " ("
-                + TrailerEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-                + TrailerEntry.COLUMN_MOVIEID_KEY + " INTEGER NOT NULL, "
-                + TrailerEntry.COLUMN_YOUTUBE_KEY + " TEXT NOT NULL, "
-                + TrailerEntry.COLUMN_TRAILER_TITLE + " TEXT NOT NULL, "
+//        final String SQL_CREATE_TRAILER_TABLE = "CREATE TABLE " + TrailerEntry.TABLE_NAME + " ("
+//                + TrailerEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+//                + TrailerEntry.COLUMN_KEY_ONE + " TEXT, "
+//                + TrailerEntry.COLUMN_KEY_TWO + " TEXT, "
+//                + TrailerEntry.COLUMN_KEY_THREE + " TEXT, "
+//                + TrailerEntry.COLUMN_KEY_FOUR + " TEXT, "
+//                + TrailerEntry.COLUMN_KEY_FIVE + " TEXT, "
+//                + TrailerEntry.COLUMN_KEY_SIX+ " TEXT, "
+//                + TrailerEntry.COLUMN_KEY_SEVEN + " TEXT );";
 
-                //添加外键，获取movieID
-                + " FOREIGN KEY (" + TrailerEntry.COLUMN_MOVIEID_KEY + ") REFERENCES "
-                + DetailEntry.TABLE_NAME + "(" + DetailEntry._ID + "));";
-
-        sqLiteDatabase.execSQL(SQL_CREATE_TRAILER_TABLE);
+//        sqLiteDatabase.execSQL(SQL_CREATE_TRAILER_TABLE);
         sqLiteDatabase.execSQL(SQL_CREATE_DETAIL_TABLE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + DetailEntry.TABLE_NAME);
-        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TrailerEntry.TABLE_NAME);
+//        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TrailerEntry.TABLE_NAME);
         onCreate(sqLiteDatabase);
     }
 }
