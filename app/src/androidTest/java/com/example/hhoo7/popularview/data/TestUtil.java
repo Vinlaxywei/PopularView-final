@@ -121,4 +121,25 @@ public class TestUtil extends AndroidTestCase {
 
     }
 
+    public static ContentValues createTrailerTableTestValue() {
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(MovieContract.TrailerEntry.COLUMN_MOVIE_ID, 331412);
+        contentValues.put(MovieContract.TrailerEntry.COLUMN_VIDEO_LINK, "HTTP://YOUTUBE 01");
+        contentValues.put(MovieContract.TrailerEntry.COLUMN_VIDEO_TITLE, "JUNGLE BOOK");
+        return contentValues;
+    }
+
+    public static ContentValues createDetailTableTestValue() {
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(MovieContract.DetailEntry.COLUMN_MOVIE_TITLE, "SUPERMAN");
+        contentValues.put(MovieContract.DetailEntry.COLUMN_POSTER_PATH, "posterpath");
+        contentValues.put(MovieContract.DetailEntry.COLUMN_OVER_VIEW, "over view");
+        contentValues.put(MovieContract.DetailEntry.COLUMN_VOTE_AVERAGE, 7.2);
+        contentValues.put(MovieContract.DetailEntry.COLUMN_RELEASE_DATE, "2015-02-03");
+        contentValues.put(MovieContract.DetailEntry.COLUMN_MOVIE_ID, 1233123);
+        contentValues.put(MovieContract.DetailEntry.COLUMN_POPULARITY, 30.222);
+        contentValues.put(MovieContract.DetailEntry.COLUMN_FAVORITE, 0);
+        return contentValues;
+    }
+
 }

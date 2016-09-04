@@ -72,7 +72,7 @@ public class TestDb extends AndroidTestCase {
 //        c.close();
 //    }
 
-//    public long testTrailerTable() {
+    //    public long testTrailerTable() {
 //        //获取数据库实例
 //        MovieDbHelper dbHelper = new MovieDbHelper(mContext);
 //        SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -120,9 +120,6 @@ public class TestDb extends AndroidTestCase {
     //测试电影详情表格是否成功创建
     public void testDetailTable() {
 
-//        long trailerRowId = testTrailerTable();
-//        assertTrue("trailerRowId is error" + trailerRowId, trailerRowId != -1l);
-
         //获取数据库实例
         MovieDbHelper dbHelper = new MovieDbHelper(mContext);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -144,7 +141,7 @@ public class TestDb extends AndroidTestCase {
         long rowID = db.insert(MovieContract.DetailEntry.TABLE_NAME, null, testValue);
 
         //确认插入是否成功，插入失败则行号等于-1，
-        assertTrue("写入数据所返回的行号不正确: " +rowID, rowID != -1);
+        assertTrue("写入数据所返回的行号不正确: " + rowID, rowID != -1);
 
         //将游标对准整个表格
         Cursor cursor = db.query(
@@ -169,12 +166,27 @@ public class TestDb extends AndroidTestCase {
         //测试完毕，关闭数据库与游标
         db.close();
         cursor.close();
-        assertTrue(""+rowID,5==4);
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
+    public void testTableTrailer() {
+        MovieDbHelper dbHelper = new MovieDbHelper(mContext);
+        SQLiteDatabase database = dbHelper.getWritableDatabase();
+
+        ContentValues testValue = new ContentValues();
+        testValue.put(MovieContract.TrailerEntry.COLUMN_MOVIE_ID, 224477);
+        testValue.put(MovieContract.TrailerEntry.COLUMN_VIDEO_LINK, "HTTPSDKLJASK");
+        testValue.put(MovieContract.TrailerEntry.COLUMN_VIDEO_TITLE, "the jungle book");
+        long rowId = database.insert(MovieContract.TrailerEntry.TABLE_NAME,null,testValue);
+        assertTrue("the row ID is wrong",rowId !=-1);
+
+        Cursor cursor = database.query(MovieContract.TrailerEntry.TABLE_NAME,null,null,null,null,null,null);
+        assertTrue("the cursor is empty",cursor.moveToFirst());
+
+        TestUtil.validateCurrentRecord("数据错误",cursor,testValue);
+
+        cursor.close();
+        database.close();
+        assertTrue(5==3);
     }
 
 }

@@ -10,9 +10,9 @@ import android.widget.ImageView;
 
 import com.example.hhoo7.popularview.data.MovieContract;
 
-public class ForecastAdapter extends CursorAdapter {
+public class MovieAdapter extends CursorAdapter {
 
-    public ForecastAdapter(Context context, Cursor c, int flags) {
+    public MovieAdapter(Context context, Cursor c, int flags) {
         super(context, c, flags);
     }
 
@@ -26,6 +26,6 @@ public class ForecastAdapter extends CursorAdapter {
     public void bindView(View view, Context context, Cursor cursor) {
         ImageView imageView = (ImageView) view;
         String posterUri = cursor.getString(cursor.getColumnIndex(MovieContract.DetailEntry.COLUMN_POSTER_PATH));
-        PublicMethod.loadPicture(context, posterUri, imageView);
+        Utility.loadPicture(context, posterUri, imageView);
     }
 }

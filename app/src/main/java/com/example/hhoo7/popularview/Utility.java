@@ -7,9 +7,9 @@ import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
 
-public class PublicMethod {
+public class Utility {
 
-    private static final String TAG = PublicMethod.class.getSimpleName();
+    private static final String TAG = Utility.class.getSimpleName();
 
 
     //自定义函数，调用第三方库Picasso，用于解析图片，并加载到ImageView中
@@ -23,7 +23,7 @@ public class PublicMethod {
     }
 
     //获取用户自定义的偏好
-    public static String getModePreference(Context context) {
+    public static String getModeFromPreference(Context context) {
         SharedPreferences mPref = PreferenceManager.getDefaultSharedPreferences(context);
         //获取电影清单类型
         return mPref.getString(context.getString(R.string.pref_movieSort_key),

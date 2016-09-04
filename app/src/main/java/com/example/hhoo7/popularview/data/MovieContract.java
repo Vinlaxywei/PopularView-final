@@ -1,5 +1,6 @@
 package com.example.hhoo7.popularview.data;
 
+import android.net.Uri;
 import android.provider.BaseColumns;
 
 /*
@@ -7,8 +8,19 @@ import android.provider.BaseColumns;
 * */
 public class MovieContract {
 
-    //电影详情表格所需要用到的字符串
+    public static final String CONTENT_AUTHORITY = "com.example.hhoo7.popularview.provider";
+
+    //content://com.example.hhoo7.popularview
+    public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
+
+    public static final String PATH_DETAILE = "detail";
+    public static final String PATH_TRAILER = "trailer";
+
     public static final class DetailEntry implements BaseColumns {
+        //内容提供器使用  content://com.example.hhoo7.popularview/detail
+        public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_DETAILE).build();
+
+        //数据库使用
         public static final String TABLE_NAME = "detail";
         public static final String COLUMN_MOVIE_TITLE = "title";
         public static final String COLUMN_POSTER_PATH = "poster_path";
@@ -19,15 +31,25 @@ public class MovieContract {
         public static final String COLUMN_POPULARITY = "popularity";
         public static final String COLUMN_FAVORITE = "favorite";
 
-        public static final String COLUMN_REVIEW = "review";
-        public static final String COLUMN_TRAILERS_FOREIGN_KEY = "trailers";
+        public static Uri buildMovieIdUri(String movieid) {
+            return CONTENT_URI.buildUpon().appendPath(movieid).build();
+        }
     }
 
     //预告片表格所需用到的字符串
     public static final class TrailerEntry implements BaseColumns {
-        public static final String TABLE_NAME = "youtubetrailers";
-        public static final String COLUMN_KEY_ONE = "key_one";
-        public static final String COLUMN_KEY_TWO = "key_two";
+        //内容提供器使用  content://com.example.hhoo7.popularview/trailer
+        public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_TRAILER).build();
+
+        //数据库使用
+        public static final String TABLE_NAME = "trailer";
+        public static final String COLUMN_MOVIE_ID = "movie_id";
+        public static final String COLUMN_VIDEO_LINK = "video_link";
+        public static final String COLUMN_VIDEO_TITLE = "video_title";
+
+        public static Uri buildMovieIdUri(String movieid) {
+            return CONTENT_URI.buildUpon().appendPath(movieid).build();
+        }
     }
 
 }

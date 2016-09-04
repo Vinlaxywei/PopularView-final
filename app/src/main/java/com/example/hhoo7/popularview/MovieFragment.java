@@ -1,14 +1,16 @@
 package com.example.hhoo7.popularview;
 
-import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,12 +22,38 @@ import android.widget.GridView;
 import android.widget.Toast;
 
 import com.example.hhoo7.popularview.data.MovieContract;
-import com.example.hhoo7.popularview.data.MovieDbHelper;
 
-public class MovieFragment extends Fragment {
+public class MovieFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+
     private String LOG_TAG = MovieFragment.class.getSimpleName();
-    MovieDbHelper dbHelper;
-    static SQLiteDatabase db;
+    private MovieAdapter mForecastAdapter;
+    private static final int MOVIEW_LOADER = 0;
+
+    public static final String[] DETAIL_COLUMN = {
+            MovieContract.DetailEntry.COLUMN_MOVIE_ID,
+            MovieContract.DetailEntry.COLUMN_MOVIE_TITLE,
+            MovieContract.DetailEntry.COLUMN_POSTER_PATH,
+            MovieContract.DetailEntry.COLUMN_VOTE_AVERAGE,
+            MovieContract.DetailEntry.COLUMN_POPULARITY,
+            MovieContract.DetailEntry.COLUMN_OVER_VIEW,
+            MovieContract.DetailEntry.COLUMN_RELEASE_DATE,
+    };
+//    static final int COL_MOVIE_ID = 0;
+    static final int COL_MOVIE_TITLE = 1;
+    static final int COL_POSTER_PATH = 2;
+    static final int COL_VOTE_AVERAGE = 3;
+    static final int COL_POPULARITY = 4;
+    static final int COL_OVER_VIEW = 5;
+    static final int COL_RELEASE_dATE = 6;
+
+    public static final String[] TRAILERS_COLUMN = {
+            MovieContract.TrailerEntry.COLUMN_MOVIE_ID,
+            MovieContract.TrailerEntry.COLUMN_VIDEO_TITLE,
+            MovieContract.TrailerEntry.COLUMN_VIDEO_LINK,
+    };
+    static final int COL_MOVIE_ID = 0;
+    static final int COL_VIDEO_TITLE = 1;
+    static final int COL_VIDEO_LINK = 2;
 
     /*
     * 构造函数
@@ -37,8 +65,6 @@ public class MovieFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        dbHelper = new MovieDbHelper(getActivity());
-        db = dbHelper.getWritableDatabase();
     }
 
     /*
@@ -72,32 +98,8 @@ public class MovieFragment extends Fragment {
     @Override
     public View onCreateView(final LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-        Cursor mCursor = null;
-        //读取用户的偏好选项，获取相应的数据库内容
-        switch (PublicMethod.getModePreference(getActivity())) {
-            case "popular":
-                mCursor = db.query(
-                        MovieContract.DetailEntry.TABLE_NAME,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        MovieContract.DetailEntry.COLUMN_POPULARITY + " DESC");
-                break;
-            case "top_rated":
-                mCursor = db.query(
-                        MovieContract.DetailEntry.TABLE_NAME,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        MovieContract.DetailEntry.COLUMN_VOTE_AVERAGE + " DESC");
-                break;
-        }
         //定义一个CursorAdapter的子类ForecastAdapter，将相应的游标传递过去
-        ForecastAdapter mForecastAdapter = new ForecastAdapter(getActivity(), mCursor, 0);
+        mForecastAdapter = new MovieAdapter(getActivity(), null, 0);
 
         /*
         * 调用GridView，绑定适配器
@@ -112,9 +114,11 @@ public class MovieFragment extends Fragment {
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-//                Intent intent = new Intent(getActivity(), DetailActivity.class);
-//                intent.putExtra("movieData",mMovieDataAdapter.getItem(i));
-//                startActivity(intent);
+                Cursor cursor = (Cursor) adapterView.getItemAtPosition(i);
+                Intent intent = new Intent(getActivity(), DetailActivity.class);
+                intent.setData(MovieContract.DetailEntry.buildMovieIdUri(
+                        cursor.getString(cursor.getColumnIndex(MovieContract.DetailEntry.COLUMN_MOVIE_ID))));
+                startActivity(intent);
 
             }
         });
@@ -122,13 +126,10 @@ public class MovieFragment extends Fragment {
         return rootView;
     }
 
-    /*
-    * 启动时更新视图.
-    * */
     @Override
-    public void onStart() {
-        super.onStart();
-        upData();
+    public void onActivityCreated(Bundle savedInstanceState) {
+        getLoaderManager().initLoader(MOVIEW_LOADER, null, this);
+        super.onActivityCreated(savedInstanceState);
     }
 
     /*
@@ -137,7 +138,7 @@ public class MovieFragment extends Fragment {
     * */
     public void upData() {
         if (isOnline()) {
-            RefreshData getMovieDate = new RefreshData(getActivity());
+            ReNewData getMovieDate = new ReNewData(getActivity());
             getMovieDate.execute();
         } else {
             Toast.makeText(getActivity(),
@@ -157,4 +158,34 @@ public class MovieFragment extends Fragment {
         return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 
+    void onModeChange() {
+        upData();
+        getLoaderManager().restartLoader(MOVIEW_LOADER,null,this);
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        CursorLoader cursorLoader = null;
+
+        switch (Utility.getModeFromPreference(getActivity())) {
+            case "popular":
+                cursorLoader = new CursorLoader(getActivity(),MovieContract.DetailEntry.CONTENT_URI,null,null,null,MovieContract.DetailEntry.COLUMN_POPULARITY + " DESC");
+                break;
+            case "top_rated":
+                cursorLoader = new CursorLoader(getActivity(),MovieContract.DetailEntry.CONTENT_URI,null,null,null,MovieContract.DetailEntry.COLUMN_VOTE_AVERAGE + " DESC");
+                break;
+        }
+
+        return cursorLoader;
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        mForecastAdapter.swapCursor(data);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        mForecastAdapter.swapCursor(null);
+    }
 }

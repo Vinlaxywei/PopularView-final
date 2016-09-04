@@ -42,4 +42,5 @@
     <string name="detail_vote_text">用户评分</string>
     <string name="detail_release_text">发布日期</string>
     <string name="detail_overview_text">简介</string>
+    <string name="detail_fragment_trailerText">预告片</string>
 </resources>
