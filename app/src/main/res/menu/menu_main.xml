@@ -14,4 +14,10 @@
         android:title="@string/action_refresh"
         app:showAsAction="never" />
 
+    <!--一键清除所有收藏-->
+    <item
+        android:id="@+id/action_clean"
+        android:title="@string/action_clean"
+        app:showAsAction="never" />
+
 </menu>

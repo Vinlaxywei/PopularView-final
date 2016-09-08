@@ -5,4 +5,6 @@
     <color name="colorAccent">#FF4081</color>
 
     <color name="colorBlack">#000000</color>
+    <color name="mLayout_light">#E1F5FE</color>f
+    <color name="divider_line">#E0E0E0</color>f
 </resources>

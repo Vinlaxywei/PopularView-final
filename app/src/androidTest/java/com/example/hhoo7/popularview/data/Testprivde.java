@@ -38,7 +38,7 @@ public class Testprivde extends AndroidTestCase {
         Uri uri = MovieContract.TrailerEntry.CONTENT_URI.buildUpon().appendPath("331412").build();
 
         cursor = mContext.getContentResolver().query(
-                MovieContract.TrailerEntry.buildMovieIdUri(331412),
+                MovieContract.TrailerEntry.buildMovieIdUri(String.valueOf(331412)),
                 null,
                 null,
                 null,
@@ -73,15 +73,15 @@ public class Testprivde extends AndroidTestCase {
                 MovieContract.TrailerEntry.COLUMN_MOVIE_ID + " = ? ",
                 new String[]{"227764"});
 
-        Cursor cursor = mContext.getContentResolver().query(
-                MovieContract.TrailerEntry.CONTENT_URI,
-                null,
-                MovieContract.TrailerEntry.COLUMN_MOVIE_ID + " = ? ",
-                new String[]{"227764"},
-                null,
-                null
-        );
-        assertTrue("cursor is empty",cursor.moveToFirst());
+//        Cursor cursor = mContext.getContentResolver().query(
+//                MovieContract.TrailerEntry.CONTENT_URI,
+//                null,
+//                MovieContract.TrailerEntry.COLUMN_MOVIE_ID + " = ? ",
+//                new String[]{"227764"},
+//                null,
+//                null
+//        );
+//        assertTrue("cursor is empty",cursor.moveToFirst());
 
 //        assertTrue(""+cursor.getString(cursor.getColumnIndex(MovieContract.TrailerEntry.COLUMN_VIDEO_TITLE)),5==3);
     }

@@ -12,7 +12,19 @@
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textColor">@android:color/black</item>
+    </style>
 
+    <style name="Divider">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:layout_marginTop">10dp</item>
+        <item name="android:layout_marginBottom">10dp</item>
+        <item name="android:background">#E0E0E0</item>
+    </style>
+
+    <style name="SettingTheme" parent="@android:style/Theme.Holo.Light.DarkActionBar">
+        <item name="colorPrimary">#2298df</item>
+        <item name="colorPrimaryDark">#137ee8</item>
     </style>
 
 </resources>

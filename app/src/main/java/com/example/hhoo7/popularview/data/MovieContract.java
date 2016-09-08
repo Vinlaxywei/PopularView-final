@@ -4,7 +4,7 @@ import android.net.Uri;
 import android.provider.BaseColumns;
 
 /*
-* 存放一些常量字符串
+* 协约：存放一些常量字符串
 * */
 public class MovieContract {
 
@@ -15,12 +15,13 @@ public class MovieContract {
 
     public static final String PATH_DETAILE = "detail";
     public static final String PATH_TRAILER = "trailer";
+    public static final String PATH_REVIEW = "review";
 
     public static final class DetailEntry implements BaseColumns {
-        //内容提供器使用  content://com.example.hhoo7.popularview/detail
+        //内容提供器使用URI  content://com.example.hhoo7.popularview/detail
         public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_DETAILE).build();
 
-        //数据库使用
+        //数据库使用的列集
         public static final String TABLE_NAME = "detail";
         public static final String COLUMN_MOVIE_TITLE = "title";
         public static final String COLUMN_POSTER_PATH = "poster_path";
@@ -29,8 +30,10 @@ public class MovieContract {
         public static final String COLUMN_RELEASE_DATE = "date";
         public static final String COLUMN_MOVIE_ID = "movie_id";
         public static final String COLUMN_POPULARITY = "popularity";
+        public static final String COLUMN_RUNTIME = "run_time";
         public static final String COLUMN_FAVORITE = "favorite";
 
+        // 构建查询URI
         public static Uri buildMovieIdUri(String movieid) {
             return CONTENT_URI.buildUpon().appendPath(movieid).build();
         }
@@ -38,10 +41,9 @@ public class MovieContract {
 
     //预告片表格所需用到的字符串
     public static final class TrailerEntry implements BaseColumns {
-        //内容提供器使用  content://com.example.hhoo7.popularview/trailer
+        //内容提供器使用URI  content://com.example.hhoo7.popularview/trailer
         public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_TRAILER).build();
 
-        //数据库使用
         public static final String TABLE_NAME = "trailer";
         public static final String COLUMN_MOVIE_ID = "movie_id";
         public static final String COLUMN_VIDEO_LINK = "video_link";
@@ -50,6 +52,18 @@ public class MovieContract {
         public static Uri buildMovieIdUri(String movieid) {
             return CONTENT_URI.buildUpon().appendPath(movieid).build();
         }
+    }
+
+    //评论表格所需用到的字符串
+    public static final class ReviewEntry implements BaseColumns {
+        //内容提供器使用  content://com.example.hhoo7.popularview/review
+        public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_REVIEW).build();
+
+        public static final String TABLE_NAME = "review";
+        public static final String COLUMN_MOVIE_ID = "movie_id";
+        public static final String COLUMN_REVIEW_AUTHOR = "review_author";
+        public static final String COLUMN_REVIEW_CONTENT = "review_content";
+
     }
 
 }

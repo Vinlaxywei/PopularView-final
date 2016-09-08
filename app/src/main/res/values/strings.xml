@@ -2,7 +2,8 @@
     <string name="app_name">PopularView</string>
     <string name="action_setting">设置</string>
     <string name="action_refresh">刷新</string>
-    <string name="title_activity_settings">Settings</string>
+    <string name="action_clean">清除所有收藏</string>
+    <string name="title_activity_settings">设置</string>
     <string name="DetailActivitty_label">电影详情</string>
     <string name="toast_display_offOline">网络状态不好哦，建议查看联网状态并尝试刷新</string>
 
@@ -11,13 +12,17 @@
     <string name="pref_movieSort_title">电影排序</string>
     <string name="pref_movieSort_key">movieSort</string>
     <string name="pref_movieSort_defalutValue">popular</string>
+    <string name="pref_movieSort_top_rated">top_rated</string>
+    <string name="pref_movieSort_myFavorite">myFavorite</string>
     <string-array name="pref_movieSort_options">
         <item>最受欢迎</item>
         <item>评分最高</item>
+        <item>我的收藏</item>
     </string-array>
     <string-array name="pref_movieSort_values">
-        <item>popular</item>
-        <item>top_rated</item>
+        <item>@string/pref_movieSort_defalutValue</item>
+        <item>@string/pref_movieSort_top_rated</item>
+        <item>@string/pref_movieSort_myFavorite</item>
     </string-array>
 
     <!--电影海报尺寸选项-->
@@ -41,6 +46,16 @@
     <string name="detail_title_text">电影名称</string>
     <string name="detail_vote_text">用户评分</string>
     <string name="detail_release_text">发布日期</string>
-    <string name="detail_overview_text">简介</string>
-    <string name="detail_fragment_trailerText">预告片</string>
+    <string name="detail_runTime_text">电影时长</string>
+    <string name="detail_fragment_trailerText">预告片区</string>
+    <string name="detail_fragment_overViewText">剧情简介</string>
+    <string name="detail_fragment_notYetTrailer">暂无预告</string>
+    <string name="detail_fragment_reviewText">评论区</string>
+    <string name="detail_fragment_notYetReview">暂无评论</string>
+    <string name="action_share">Share</string>
+    <string name="detail_like">收藏</string>
+    <string name="detail_liked">已收藏</string>
+    <string name="detail_unLike">取消收藏</string>
+    <string name="detail_like_msg">电影收藏成功，设置菜单中选择我的收藏可查看所有已收藏的电影</string>
+    <string name="detail_unlike_msg">取消收藏</string>
 </resources>
