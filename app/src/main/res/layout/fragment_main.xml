@@ -1,12 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<GridView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/movie_gridview"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@android:color/white"
-    android:numColumns="auto_fit">
+    android:layout_height="match_parent"
+    android:padding="8dp">
 
-</GridView>
+    <GridView
+        android:id="@+id/movie_gridview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:horizontalSpacing="8dp"
+        android:verticalSpacing="8dp"
+        android:numColumns="auto_fit">
 
+    </GridView>
+
+    <TextView
+        android:id="@+id/movie_gridview_empty"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:padding="@dimen/activity_vertical_margin"
+        android:text="@string/display_offLine"
+        android:textColor="@android:color/black" />
+</FrameLayout>
 

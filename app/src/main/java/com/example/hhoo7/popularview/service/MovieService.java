@@ -1,12 +1,16 @@
-package com.example.hhoo7.popularview;
+package com.example.hhoo7.popularview.service;
 
+import android.app.IntentService;
+import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.util.Log;
 
+import com.example.hhoo7.popularview.BuildConfig;
+import com.example.hhoo7.popularview.Utility;
 import com.example.hhoo7.popularview.data.MovieContract;
 
 import org.json.JSONArray;
@@ -20,27 +24,18 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-/*
-* 此函数继承自AsyncTask，用于后台发送URL请求，并对返回的json进行解析
-* 将解析后的电影信息储存在一个二维数组
-* */
-public class ReNewData extends AsyncTask<Void, Void, Void> {
-    private Context mContext;
-    private String LOG_TAG = ReNewData.class.getSimpleName();
 
-    public ReNewData(Context context) {
-        mContext = context;
+public class MovieService extends IntentService {
+    private String LOG_TAG = MovieService.class.getSimpleName();
+
+    public MovieService() {
+        super("MovieService");
     }
 
-    /*
-    * 后台任务：发送URL到Api提供商
-    * @return 返回一个String类型的二维数组，存放有电影信息，用于更新视图
-    * */
     @Override
-    protected Void doInBackground(Void... voids) {
-        //第一波发起请求，获取所有电影详情信息等
-        //获取电影清单类型
-        String mode = Utility.getModeFromPreference(mContext);
+    protected void onHandleIntent(Intent intent) {
+        Log.d(LOG_TAG, "onHandleIntent: ");
+        String mode = Utility.getModeFromPreference(this);
 
         if (!mode.equals("myFavorite")) {
             //构建URI
@@ -55,8 +50,13 @@ public class ReNewData extends AsyncTask<Void, Void, Void> {
                 }
             }
         }
+    }
 
-        return null;
+    @Override
+    public void onDestroy() {
+        Log.d(LOG_TAG, "onDestroy: Stop Service");
+        super.onDestroy();
+
     }
 
     private String sendRequest(Uri uri) {
@@ -148,7 +148,7 @@ public class ReNewData extends AsyncTask<Void, Void, Void> {
             JSONArray resultArray = movieData.getJSONArray("results");
 
             //电影海报的尺寸包括w154、w185、w342、w500、w780、original。这里默认使用适合大多数手机的尺寸：w185
-            String posterSize = Utility.getPosterSizePreference(mContext);
+            String posterSize = Utility.getPosterSizePreference(this);
 
             //用一个遍历把json列表中的电影数据提取出来，
             for (int i = 0; i < resultArray.length(); i++) {
@@ -178,7 +178,7 @@ public class ReNewData extends AsyncTask<Void, Void, Void> {
                 //解析提取电影热度
                 popularity = movieDataInfo.getString("popularity");
 
-                Cursor checkCursor = mContext.getContentResolver().query(
+                Cursor checkCursor = this.getContentResolver().query(
                         MovieContract.DetailEntry.buildMovieIdUri(movieID),
                         null,
                         null,
@@ -193,7 +193,7 @@ public class ReNewData extends AsyncTask<Void, Void, Void> {
                     values.put(MovieContract.DetailEntry.COLUMN_POSTER_PATH, posterPath);
                     values.put(MovieContract.DetailEntry.COLUMN_VOTE_AVERAGE, voteAverage);
                     values.put(MovieContract.DetailEntry.COLUMN_POPULARITY, popularity);
-                    mContext.getContentResolver().update(
+                    this.getContentResolver().update(
                             MovieContract.DetailEntry.CONTENT_URI,
                             values,
                             MovieContract.DetailEntry.COLUMN_MOVIE_ID + " = ?",
@@ -210,7 +210,7 @@ public class ReNewData extends AsyncTask<Void, Void, Void> {
                     values.put(MovieContract.DetailEntry.COLUMN_MOVIE_ID, movieID);
                     values.put(MovieContract.DetailEntry.COLUMN_POPULARITY, popularity);
                     values.put(MovieContract.DetailEntry.COLUMN_FAVORITE, 0);
-                    mContext.getContentResolver().insert(MovieContract.DetailEntry.CONTENT_URI, values);
+                    this.getContentResolver().insert(MovieContract.DetailEntry.CONTENT_URI, values);
 
                 }
                 checkCursor.close();
@@ -219,7 +219,7 @@ public class ReNewData extends AsyncTask<Void, Void, Void> {
             /*
             * 使用cursor遍历movieid，调用getTrailerAndReviewFromJson方法进行单部电影的数据写入
             * */
-            Cursor cursor = mContext.getContentResolver().query(
+            Cursor cursor = this.getContentResolver().query(
                     MovieContract.DetailEntry.CONTENT_URI,
                     new String[]{MovieContract.DetailEntry.COLUMN_MOVIE_ID},
                     null,
@@ -230,8 +230,8 @@ public class ReNewData extends AsyncTask<Void, Void, Void> {
                 do {
                     getTrailerAndReviewFromJson(cursor.getString(cursor.getColumnIndex(MovieContract.DetailEntry.COLUMN_MOVIE_ID)));
                 } while (cursor.moveToNext());
-                cursor.close();
             }
+            cursor.close();
 
         } catch (JSONException E) {
             Log.e(LOG_TAG, E.getMessage(), E);
@@ -262,7 +262,7 @@ public class ReNewData extends AsyncTask<Void, Void, Void> {
             String runtiem = jsonData.getString("runtime");
             ContentValues detailValue = new ContentValues();
             detailValue.put(MovieContract.DetailEntry.COLUMN_RUNTIME, runtiem);
-            mContext.getContentResolver().update(
+            this.getContentResolver().update(
                     MovieContract.DetailEntry.CONTENT_URI,
                     detailValue,
                     MovieContract.DetailEntry.COLUMN_MOVIE_ID + " = ? ",
@@ -281,7 +281,7 @@ public class ReNewData extends AsyncTask<Void, Void, Void> {
                 trailerValue.put(MovieContract.TrailerEntry.COLUMN_VIDEO_TITLE, VideoTitle);
                 trailerValue.put(MovieContract.TrailerEntry.COLUMN_VIDEO_LINK, VideoLink);
 
-                Cursor checkCursor = mContext.getContentResolver().query(
+                Cursor checkCursor = this.getContentResolver().query(
                         MovieContract.TrailerEntry.CONTENT_URI,
                         null,
                         MovieContract.TrailerEntry.COLUMN_VIDEO_TITLE + " = ? and " + MovieContract.TrailerEntry.COLUMN_MOVIE_ID + " = ? ",
@@ -289,7 +289,7 @@ public class ReNewData extends AsyncTask<Void, Void, Void> {
                         null);
 
                 if (!checkCursor.moveToFirst()) {
-                    mContext.getContentResolver().insert(MovieContract.TrailerEntry.CONTENT_URI, trailerValue);
+                    this.getContentResolver().insert(MovieContract.TrailerEntry.CONTENT_URI, trailerValue);
                 }
                 checkCursor.close();
             }
@@ -306,7 +306,7 @@ public class ReNewData extends AsyncTask<Void, Void, Void> {
                 reviewValue.put(MovieContract.ReviewEntry.COLUMN_REVIEW_AUTHOR, reviewAuthor);
                 reviewValue.put(MovieContract.ReviewEntry.COLUMN_REVIEW_CONTENT, reviewContent);
 
-                Cursor checkCursor = mContext.getContentResolver().query(
+                Cursor checkCursor = this.getContentResolver().query(
                         MovieContract.ReviewEntry.CONTENT_URI,
                         null,
                         MovieContract.ReviewEntry.COLUMN_REVIEW_AUTHOR + " = ? and " + MovieContract.ReviewEntry.COLUMN_MOVIE_ID + " = ? ",
@@ -314,7 +314,7 @@ public class ReNewData extends AsyncTask<Void, Void, Void> {
                         null);
 
                 if (!checkCursor.moveToFirst()) {
-                    mContext.getContentResolver().insert(MovieContract.ReviewEntry.CONTENT_URI, reviewValue);
+                    this.getContentResolver().insert(MovieContract.ReviewEntry.CONTENT_URI, reviewValue);
                 }
                 checkCursor.close();
             }
@@ -324,4 +324,12 @@ public class ReNewData extends AsyncTask<Void, Void, Void> {
         }
     }
 
+    public static class alarm extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // 在启动服务方和被启动服务之前创建一个广播接收器屏障
+            Intent sendIntent = new Intent(context,MovieService.class);
+            context.startService(sendIntent);
+        }
+    }
 }

@@ -16,12 +16,24 @@ public class MovieAdapter extends CursorAdapter {
         super(context, c, flags);
     }
 
+     static class ViewHolder {
+        ImageView posterView;
+
+        ViewHolder(View view) {
+            posterView = (ImageView) view.findViewById(R.id.poster_imageview);
+        }
+    }
+
     /*
     * 返回一个新的视图Item
     * */
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         View view = LayoutInflater.from(context).inflate(R.layout.gridview_item, parent, false);
+
+        ViewHolder viewHolder = new ViewHolder(view);
+        view.setTag(viewHolder);
+
         return view;
     }
 
@@ -30,8 +42,9 @@ public class MovieAdapter extends CursorAdapter {
     * */
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        ImageView imageView = (ImageView) view.findViewById(R.id.poster_imageview);
+        ViewHolder viewHolder = (ViewHolder) view.getTag();
+
         String posterUri = cursor.getString(cursor.getColumnIndex(MovieContract.DetailEntry.COLUMN_POSTER_PATH));
-        Utility.loadPicture(context, posterUri, imageView);
+        Utility.loadPicture(context, posterUri, viewHolder.posterView);
     }
 }

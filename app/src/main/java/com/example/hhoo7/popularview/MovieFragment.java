@@ -1,11 +1,11 @@
 package com.example.hhoo7.popularview;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -21,17 +21,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.hhoo7.popularview.data.MovieContract;
+import com.example.hhoo7.popularview.service.MovieService;
 
 public class MovieFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private String LOG_TAG = MovieFragment.class.getSimpleName();
+
     // 这个Adapter将使用cursor提取数据，并填充到gridview中
     private MovieAdapter mForecastAdapter;
     // Loader专用识别号
-    private static final int MOVIEW_LOADER = 0;
+    private static final int MOVIE_LOADER = 0;
 
     private GridView gridView;
 
@@ -100,6 +103,7 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        getActivity().startService(new Intent(getContext(), MovieService.class));
     }
 
     /*
@@ -116,6 +120,7 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
             // 刷新按钮：启动AsyncTask，更新数据及视图
             case R.id.action_refresh:
                 upData();
+                onModeChange();
                 return true;
 
             // 设置按钮：跳转到设置界面
@@ -145,7 +150,6 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
     @Nullable
     @Override
     public View onCreateView(final LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-
         // 实例化Adapter。
         mForecastAdapter = new MovieAdapter(getActivity(), null, 0);
 
@@ -155,6 +159,12 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         gridView = (GridView) rootView.findViewById(R.id.movie_gridview);
         gridView.setAdapter(mForecastAdapter);
+
+        TextView emptyView = (TextView) rootView.findViewById(R.id.movie_gridview_empty);
+        if (Utility.getModeFromPreference(getActivity()).equals(getString(R.string.pref_movieSort_myFavorite))) {
+            emptyView.setText(R.string.toast_display_noFavorite);
+        }
+        gridView.setEmptyView(emptyView);
 
         /*
         * GridView设置点击监听器，触发后传递解析后的电影相关信息，并调转到电影详情界面
@@ -214,7 +224,7 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
     * */
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
-        getLoaderManager().initLoader(MOVIEW_LOADER, null, this);
+        getLoaderManager().initLoader(MOVIE_LOADER, null, this);
         super.onActivityCreated(savedInstanceState);
     }
 
@@ -223,25 +233,22 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
     * if判断：调用检查网络的方法，检查设备网络状况，无网络时弹出提示
     * */
     public void upData() {
-        if (isOnline()) {
-            ReNewData getMovieDate = new ReNewData(getActivity());
-            getMovieDate.execute();
+        if (Utility.isOnline(getActivity())) {
+            // 创建Intent对象，目标指向广播接收器。可在此处传入需要传递给service的信息
+            Intent alarmIntent = new Intent(getContext(), MovieService.alarm.class);
+
+            // 设置启动次数，同时绑定Intent数据到此处
+            PendingIntent pi = PendingIntent.getBroadcast(getActivity(), 0, alarmIntent, PendingIntent.FLAG_ONE_SHOT);
+            // 创建AlarmManager。并设置延时时间，绑定Intent。
+            AlarmManager am = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
+            am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 1000, pi);
+
         } else {
             Toast.makeText(getActivity(),
-                    R.string.toast_display_offOline,
+                    R.string.toast_display_offLine,
                     Toast.LENGTH_LONG)
                     .show();
         }
-    }
-
-    /*
-    * @return 设备网络情况
-    * */
-    public boolean isOnline() {
-        ConnectivityManager cm =
-                (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo netInfo = cm.getActiveNetworkInfo();
-        return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 
     /*
@@ -249,10 +256,10 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
     * */
     void onModeChange() {
         if (Utility.getModeFromPreference(getActivity()).equals(getString(R.string.pref_movieSort_myFavorite))) {
-            getLoaderManager().restartLoader(MOVIEW_LOADER, null, this);
+            getLoaderManager().restartLoader(MOVIE_LOADER, null, this);
         } else {
-            upData();
-            getLoaderManager().restartLoader(MOVIEW_LOADER, null, this);
+//            upData();
+            getLoaderManager().restartLoader(MOVIE_LOADER, null, this);
         }
 
     }
@@ -305,7 +312,7 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
 
         // 当用户选择“我的收藏”电影排序时，检查当前是否有收藏电影，如果没有则弹出相应提示
         if (!data.moveToFirst() && MainActivity.mMode.equals(getString(R.string.pref_movieSort_myFavorite))) {
-            Toast.makeText(getActivity(), "暂无收藏电影", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), R.string.toast_display_noFavorite, Toast.LENGTH_SHORT).show();
         }
 
     }

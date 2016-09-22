@@ -4,10 +4,11 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.MotionEvent;
 
 public class MainActivity extends AppCompatActivity implements MovieFragment.CallBack {
 
-    private static final String TAG = MainActivity.class.getSimpleName();
+    private static final String LOG_TAG = MainActivity.class.getSimpleName();
     // 这个标签将用于在平板模式下识别电影详情布局
     private final String DETAILFRAGMENT_TAG = "DFTAG";
     // 这个字符串将用于存储当前用户选择的电影排序模式
@@ -35,9 +36,29 @@ public class MainActivity extends AppCompatActivity implements MovieFragment.Cal
         }
     }
 
-    /*
-    * 重写onResume参数，用于响应用户进入设置界面返回主界面，即时更新电影排序
-    * */
+    float downY;
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        float y = ev.getY();
+        float minScroll = 100;
+
+        switch (ev.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                downY = y;
+                break;
+            case MotionEvent.ACTION_UP:
+                float scrollY = y - downY;
+                if (scrollY > 0 && Math.abs(scrollY) > minScroll + 200) {
+                    getSupportActionBar().show();
+                } else if (scrollY < 0 && Math.abs(scrollY) > minScroll) {
+                    getSupportActionBar().hide();
+                }
+
+        }
+        return super.dispatchTouchEvent(ev);
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -59,6 +80,7 @@ public class MainActivity extends AppCompatActivity implements MovieFragment.Cal
             mf.onModeChange();
         }
         mMode = mode;
+
     }
 
     /*

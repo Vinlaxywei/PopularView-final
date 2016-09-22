@@ -5,7 +5,7 @@
     <string name="action_clean">清除所有收藏</string>
     <string name="title_activity_settings">设置</string>
     <string name="DetailActivitty_label">电影详情</string>
-    <string name="toast_display_offOline">网络状态不好哦，建议查看联网状态并尝试刷新</string>
+    <string name="toast_display_offLine">网络状态不好哦，建议查看联网状态并尝试刷新</string>
 
     <!--设置菜单用到的字符串-->
     <!--电影排序选项-->
@@ -56,6 +56,8 @@
     <string name="detail_like">收藏</string>
     <string name="detail_liked">已收藏</string>
     <string name="detail_unLike">取消收藏</string>
-    <string name="detail_like_msg">电影收藏成功，设置菜单中选择我的收藏可查看所有已收藏的电影</string>
-    <string name="detail_unlike_msg">取消收藏</string>
+    <string name="toast_display_like_msg">电影收藏成功，设置菜单中选择我的收藏可查看所有已收藏的电影</string>
+    <string name="toast_display_unlike_msg">取消收藏</string>
+    <string name="display_offLine">当前电影数据无，尝试连接网络或者刷新一下</string>
+    <string name="toast_display_noFavorite">暂无收藏电影</string>
 </resources>

@@ -2,6 +2,7 @@ package com.example.hhoo7.popularview;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.MotionEvent;
 
 public class DetailActivity extends AppCompatActivity {
     private String LOG_TAG = DetailFragment.class.getSimpleName();
@@ -13,7 +14,7 @@ public class DetailActivity extends AppCompatActivity {
 
         // 将电影 Uri 数据封装到 Bundle
         Bundle argument = new Bundle();
-        argument.putParcelable(DetailFragment.DETAIL_URI,getIntent().getData());
+        argument.putParcelable(DetailFragment.DETAIL_URI, getIntent().getData());
 
         // 创建 fragment 实例，并将数据传入
         DetailFragment fragment = new DetailFragment();
@@ -24,8 +25,28 @@ public class DetailActivity extends AppCompatActivity {
                 .replace(R.id.movie_detail_container, fragment)
                 .commit();
 
-        //在电影详情界面的左上角添加返回按钮，在这里象征意义大于实际意义
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
+    private float downY;
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        float y = ev.getY();
+        float minScroll = 100;
+
+        switch (ev.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                downY = y;
+                break;
+            case MotionEvent.ACTION_UP:
+                float scrollY = y - downY;
+                if (scrollY > 0 && Math.abs(scrollY) > minScroll+200) {
+                    getSupportActionBar().show();
+                } else if (scrollY < 0 && Math.abs(scrollY) > minScroll){
+                    getSupportActionBar().hide();
+                }
+
+        }
+
+        return super.dispatchTouchEvent(ev);
+    }
 }

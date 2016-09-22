@@ -44,18 +44,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     static final String DETAIL_URI = "detail_uri";
     private Uri mUri;
 
-    // 声明xml文件中的布局元素，将用于填充数据
-    private ImageView posterImage;
-    private TextView movieTitle;
-    private TextView overView;
-    private TextView voteAverage;
-    private TextView releaseDate;
-    private TextView runTime;
-    private Button likeButton;
-    private ImageView likeImage;
-    private TextView trailerHint;
-    private LinearLayout mLayout;
-
     // 将当前电影的收藏状态存储下来
     private Boolean isLike;
 
@@ -65,9 +53,38 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     public DetailFragment() {
     }
 
+    static class ViewHolder {
+        ImageView posterImage;
+        TextView movieTitle;
+        TextView overView;
+        TextView voteAverage;
+        TextView releaseDate;
+        TextView runTime;
+        Button likeButton;
+        ImageView likeImage;
+        TextView trailerHint;
+        LinearLayout mLayout;
+
+        ViewHolder(View view) {
+            posterImage = (ImageView) view.findViewById(R.id.detail_poster_imageview);
+            movieTitle = (TextView) view.findViewById(R.id.detail_title_textview);
+            overView = (TextView) view.findViewById(R.id.detail_overview_textview);
+            voteAverage = (TextView) view.findViewById(R.id.detail_voteAverager_textview);
+            releaseDate = (TextView) view.findViewById(R.id.detail_releaseDate_textview);
+            runTime = (TextView) view.findViewById(R.id.detail_runTime_textview);
+            trailerHint = (TextView) view.findViewById(R.id.detail_fragment_trailerText);
+            likeButton = (Button) view.findViewById(R.id.detail_like_button);
+            likeImage = (ImageView) view.findViewById(R.id.detail_like_image);
+            mLayout = (LinearLayout) view.findViewById(R.id.detail_LL_layout);
+        }
+    }
+
+    ViewHolder detailViewHolder;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         dp2 = Utility.Dp2Px(getActivity(), 2);
         dp8 = Utility.Dp2Px(getActivity(), 8);
         setHasOptionsMenu(true);
@@ -101,20 +118,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         }
 
         View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
-
-        /*
-        * 实例化布局元素，将逐一写入数据
-        * */
-        posterImage = (ImageView) rootView.findViewById(R.id.detail_poster_imageview);
-        movieTitle = (TextView) rootView.findViewById(R.id.detail_title_textview);
-        overView = (TextView) rootView.findViewById(R.id.detail_overview_textview);
-        voteAverage = (TextView) rootView.findViewById(R.id.detail_voteAverager_textview);
-        releaseDate = (TextView) rootView.findViewById(R.id.detail_releaseDate_textview);
-        runTime = (TextView) rootView.findViewById(R.id.detail_runTime_textview);
-        trailerHint = (TextView) rootView.findViewById(R.id.detail_fragment_trailerText);
-        likeButton = (Button) rootView.findViewById(R.id.detail_like_button);
-        likeImage = (ImageView) rootView.findViewById(R.id.detail_like_image);
-        mLayout = (LinearLayout) rootView.findViewById(R.id.detail_LL_layout);
+        detailViewHolder = new ViewHolder(rootView);
+        rootView.setTag(detailViewHolder);
 
         /*
         * 实例化一个cursor对象，用于查询当前电影收藏状态，并根据查询状态调用方法更新相关视图
@@ -138,7 +143,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         * 收藏按钮设置点击事件监听器。
         * 更新数据库 favorite 信息，调用方法更新视图
         * */
-        likeButton.setOnClickListener(new View.OnClickListener() {
+        detailViewHolder.likeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (!isLike) {
@@ -147,14 +152,14 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                     getActivity().getContentResolver().update(mUri, likeValue, null, null);
                     isLike = true;
                     changeLikeState();
-                    displaylikeMsg(getString(R.string.detail_like_msg), Toast.LENGTH_LONG);
+                    displaylikeMsg(getString(R.string.toast_display_like_msg), Toast.LENGTH_LONG);
                 } else {
                     ContentValues likeValue = new ContentValues();
                     likeValue.put(MovieContract.DetailEntry.COLUMN_FAVORITE, 0);
                     getActivity().getContentResolver().update(mUri, likeValue, null, null);
                     isLike = false;
                     changeLikeState();
-                    displaylikeMsg(getString(R.string.detail_unlike_msg), Toast.LENGTH_SHORT);
+                    displaylikeMsg(getString(R.string.toast_display_unlike_msg), Toast.LENGTH_SHORT);
                 }
             }
         });
@@ -162,22 +167,23 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         return rootView;
     }
 
-    Toast toast;
-    void displaylikeMsg(String likeMsg, int msgDuration) {
+    private Toast toast;
+
+    private void displaylikeMsg(String likeMsg, int msgDuration) {
         if (toast != null) {
             toast.cancel();
         }
-        toast = Toast.makeText(getActivity(),likeMsg,msgDuration);
+        toast = Toast.makeText(getActivity(), likeMsg, msgDuration);
         toast.show();
     }
 
     private void changeLikeState() {
         if (isLike) {
-            likeImage.setImageResource(R.drawable.ic_star_black_24dp);
-            likeButton.setText(R.string.detail_liked);
+            detailViewHolder.likeImage.setImageResource(R.drawable.ic_star_black_24dp);
+            detailViewHolder.likeButton.setText(R.string.detail_liked);
         } else {
-            likeImage.setImageResource(R.drawable.ic_star_border_black_24dp);
-            likeButton.setText(getString(R.string.detail_like));
+            detailViewHolder.likeImage.setImageResource(R.drawable.ic_star_border_black_24dp);
+            detailViewHolder.likeButton.setText(getString(R.string.detail_like));
         }
     }
 
@@ -220,8 +226,10 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         trailerView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(videoLink));
-                startActivity(intent);
+                Intent videointent = new Intent(Intent.ACTION_VIEW, Uri.parse(videoLink));
+                if (Utility.checkIntent(getActivity(), videointent)) {
+                    startActivity(videointent);
+                }
             }
         });
 
@@ -317,12 +325,12 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         * 填充电影详情布局
         * */
         String posterPath = cursor.getString(MovieFragment.COL_POSTER_PATH);
-        Utility.loadPicture(getActivity(), posterPath, posterImage);
-        movieTitle.setText(cursor.getString(MovieFragment.COL_MOVIE_TITLE));
-        overView.setText(cursor.getString(MovieFragment.COL_OVER_VIEW));
-        voteAverage.setText(String.format("用户评分：%s", cursor.getString(MovieFragment.COL_VOTE_AVERAGE)));
-        releaseDate.setText(String.format("发布日期：%s", cursor.getString(MovieFragment.COL_RELEASE_dATE)));
-        runTime.setText(String.format("电影时长：%s min", cursor.getString(MovieFragment.COL_RUNTIME)));
+        Utility.loadPicture(getActivity(), posterPath, detailViewHolder.posterImage);
+        detailViewHolder.movieTitle.setText(cursor.getString(MovieFragment.COL_MOVIE_TITLE));
+        detailViewHolder.overView.setText(cursor.getString(MovieFragment.COL_OVER_VIEW));
+        detailViewHolder.voteAverage.setText(String.format("用户评分：%s", cursor.getString(MovieFragment.COL_VOTE_AVERAGE)));
+        detailViewHolder.releaseDate.setText(String.format("发布日期：%s", cursor.getString(MovieFragment.COL_RELEASE_dATE)));
+        detailViewHolder.runTime.setText(String.format("电影时长：%s min", cursor.getString(MovieFragment.COL_RUNTIME)));
 
         // ------------------------------布局分割线-------------------------------
 
@@ -345,10 +353,10 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                         cursor.getString(MovieFragment.COL_MOVIE_TITLE), mCursor.getString(MovieFragment.COL_VIDEO_LINK));
                 do {
                     videoLink = String.format("https://www.youtube.com/watch?v=%s", mCursor.getString(MovieFragment.COL_VIDEO_LINK));
-                    mLayout.addView(addTrailerView(mCursor.getString(MovieFragment.COL_VIDEO_TITLE), videoLink));
+                    detailViewHolder.mLayout.addView(addTrailerView(mCursor.getString(MovieFragment.COL_VIDEO_TITLE), videoLink));
                 } while (mCursor.moveToNext());
             } else {
-                trailerHint.setText(R.string.detail_fragment_notYetTrailer);
+                detailViewHolder.trailerHint.setText(R.string.detail_fragment_notYetTrailer);
             }
         }
 
@@ -374,18 +382,19 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         if (mCursor != null) {
             if (mCursor.moveToFirst()) {
                 reviewHintText.setText(R.string.detail_fragment_reviewText);
-                mLayout.addView(reviewHintText);
+                detailViewHolder.mLayout.addView(reviewHintText);
                 do {
-                    mLayout.addView(addReviewView(mCursor.getString(MovieFragment.COL_REVIEW_AUTHOR), mCursor.getString(MovieFragment.COL_REVIEW_CONTENT)));
+                    detailViewHolder.mLayout.addView(addReviewView(mCursor.getString(MovieFragment.COL_REVIEW_AUTHOR), mCursor.getString(MovieFragment.COL_REVIEW_CONTENT)));
                 } while (mCursor.moveToNext());
 
             } else {
                 reviewHintText.setText(R.string.detail_fragment_notYetReview);
-                mLayout.addView(reviewHintText);
+                detailViewHolder.mLayout.addView(reviewHintText);
             }
             mCursor.close();
         }
 
+        cursor.close();
 
     }
 
