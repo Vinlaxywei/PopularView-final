@@ -20,42 +20,35 @@ public class MovieProvider extends ContentProvider {
     static final int TABLE_REVIEW_DIR = 5;
     static final int TABLE_REVIEW_ITEM = 6;
 
-    // 声明 UriMatcher 对象，将用于识别uri
     private static final UriMatcher uriMatcher;
 
-    //声明数据库助手与数据库类
     private MovieDbHelper dbHelper;
     private SQLiteDatabase database;
 
     static {
         uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
         // content://com.example.hhoo7.popularview.data/detail
-        uriMatcher.addURI(MovieContract.CONTENT_AUTHORITY, MovieContract.PATH_DETAILE, TABLE_DETAIL_DIR);
+        uriMatcher.addURI(DatabaseContract.CONTENT_AUTHORITY, DatabaseContract.PATH_DETAILE, TABLE_DETAIL_DIR);
         // content://com.example.hhoo7.popularview.data/detail/#
-        uriMatcher.addURI(MovieContract.CONTENT_AUTHORITY, MovieContract.PATH_DETAILE + "/#", TABLE_DETAIL_ITEM);
+        uriMatcher.addURI(DatabaseContract.CONTENT_AUTHORITY, DatabaseContract.PATH_DETAILE + "/#", TABLE_DETAIL_ITEM);
         // content://com.example.hhoo7.popularview.data/trailer
-        uriMatcher.addURI(MovieContract.CONTENT_AUTHORITY, MovieContract.PATH_TRAILER, TABLE_TRAILER_DIR);
+        uriMatcher.addURI(DatabaseContract.CONTENT_AUTHORITY, DatabaseContract.PATH_TRAILER, TABLE_TRAILER_DIR);
         // content://com.example.hhoo7.popularview.data/trailer/#
-        uriMatcher.addURI(MovieContract.CONTENT_AUTHORITY, MovieContract.PATH_TRAILER + "/#", TABLE_TRAILER_ITEM);
+        uriMatcher.addURI(DatabaseContract.CONTENT_AUTHORITY, DatabaseContract.PATH_TRAILER + "/#", TABLE_TRAILER_ITEM);
         // content://com.example.hhoo7.popularview.data/review
-        uriMatcher.addURI(MovieContract.CONTENT_AUTHORITY, MovieContract.PATH_REVIEW, TABLE_REVIEW_DIR);
+        uriMatcher.addURI(DatabaseContract.CONTENT_AUTHORITY, DatabaseContract.PATH_REVIEW, TABLE_REVIEW_DIR);
         // content://com.example.hhoo7.popularview.data/review/#
-        uriMatcher.addURI(MovieContract.CONTENT_AUTHORITY, MovieContract.PATH_REVIEW + "/#", TABLE_REVIEW_ITEM);
+        uriMatcher.addURI(DatabaseContract.CONTENT_AUTHORITY, DatabaseContract.PATH_REVIEW + "/#", TABLE_REVIEW_ITEM);
     }
 
     @Override
     public boolean onCreate() {
-        // 实例化数据库，实际操作还是进行数据库的数据编辑
         dbHelper = new MovieDbHelper(getContext());
         database = dbHelper.getWritableDatabase();
 
-        // 这里记得返回true，否则内容提供器将无法正确创建
         return true;
     }
 
-    /*
-    * 重写 query 方法
-    * */
     @Nullable
     @Override
     public Cursor query(Uri uri, String[] columns, String selection, String[] selectionArgs, String sortOrder) {
@@ -63,36 +56,36 @@ public class MovieProvider extends ContentProvider {
         String movieId;
         switch (uriMatcher.match(uri)) {
             case TABLE_DETAIL_DIR:
-                cursor = database.query(MovieContract.DetailEntry.TABLE_NAME, columns, selection, selectionArgs, null, null, sortOrder);
+                cursor = database.query(DatabaseContract.DetailEntry.TABLE_NAME, columns, selection, selectionArgs, null, null, sortOrder);
                 break;
             case TABLE_DETAIL_ITEM:
                 movieId = uri.getPathSegments().get(1);
                 cursor = database.query(
-                        MovieContract.DetailEntry.TABLE_NAME,
+                        DatabaseContract.DetailEntry.TABLE_NAME,
                         columns,
-                        MovieContract.DetailEntry.COLUMN_MOVIE_ID + " = ?",
+                        DatabaseContract.DetailEntry.COLUMN_MOVIE_ID + " = ?",
                         new String[]{movieId}, null, null, sortOrder);
                 break;
             case TABLE_TRAILER_DIR:
-                cursor = database.query(MovieContract.TrailerEntry.TABLE_NAME, columns, selection, selectionArgs, null, null, sortOrder);
+                cursor = database.query(DatabaseContract.TrailerEntry.TABLE_NAME, columns, selection, selectionArgs, null, null, sortOrder);
                 break;
             case TABLE_TRAILER_ITEM:
                 movieId = uri.getLastPathSegment();
                 cursor = database.query(
-                        MovieContract.TrailerEntry.TABLE_NAME,
+                        DatabaseContract.TrailerEntry.TABLE_NAME,
                         columns,
-                        MovieContract.TrailerEntry.COLUMN_MOVIE_ID + " = ?",
+                        DatabaseContract.TrailerEntry.COLUMN_MOVIE_ID + " = ?",
                         new String[]{movieId}, null, null, sortOrder);
                 break;
             case TABLE_REVIEW_DIR:
-                cursor = database.query(MovieContract.ReviewEntry.TABLE_NAME, columns, selection, selectionArgs, null, null, sortOrder);
+                cursor = database.query(DatabaseContract.ReviewEntry.TABLE_NAME, columns, selection, selectionArgs, null, null, sortOrder);
                 break;
             case TABLE_REVIEW_ITEM:
                 movieId = uri.getLastPathSegment();
                 cursor = database.query(
-                        MovieContract.ReviewEntry.TABLE_NAME,
+                        DatabaseContract.ReviewEntry.TABLE_NAME,
                         columns,
-                        MovieContract.ReviewEntry.COLUMN_MOVIE_ID + " = ?",
+                        DatabaseContract.ReviewEntry.COLUMN_MOVIE_ID + " = ?",
                         new String[]{movieId}, null, null, sortOrder);
                 break;
             default:
@@ -101,9 +94,6 @@ public class MovieProvider extends ContentProvider {
         return cursor;
     }
 
-    /*
-    * 重写 insert 方法
-    * */
     @Nullable
     @Override
     public Uri insert(Uri uri, ContentValues contentValues) {
@@ -111,18 +101,18 @@ public class MovieProvider extends ContentProvider {
         switch (uriMatcher.match(uri)) {
             case TABLE_DETAIL_DIR:
             case TABLE_DETAIL_ITEM:
-                long detailRowId = database.insert(MovieContract.DetailEntry.TABLE_NAME, null, contentValues);
-                returnUri = MovieContract.DetailEntry.CONTENT_URI.buildUpon().appendPath(String.valueOf(detailRowId)).build();
+                long detailRowId = database.insert(DatabaseContract.DetailEntry.TABLE_NAME, null, contentValues);
+                returnUri = DatabaseContract.DetailEntry.CONTENT_URI.buildUpon().appendPath(String.valueOf(detailRowId)).build();
                 break;
             case TABLE_TRAILER_DIR:
             case TABLE_TRAILER_ITEM:
-                long trailerRowId = database.insert(MovieContract.TrailerEntry.TABLE_NAME, null, contentValues);
-                returnUri = MovieContract.TrailerEntry.CONTENT_URI.buildUpon().appendPath(String.valueOf(trailerRowId)).build();
+                long trailerRowId = database.insert(DatabaseContract.TrailerEntry.TABLE_NAME, null, contentValues);
+                returnUri = DatabaseContract.TrailerEntry.CONTENT_URI.buildUpon().appendPath(String.valueOf(trailerRowId)).build();
                 break;
             case TABLE_REVIEW_DIR:
             case TABLE_REVIEW_ITEM:
-                long reviewRowId = database.insert(MovieContract.ReviewEntry.TABLE_NAME, null, contentValues);
-                returnUri = MovieContract.ReviewEntry.CONTENT_URI.buildUpon().appendPath(String.valueOf(reviewRowId)).build();
+                long reviewRowId = database.insert(DatabaseContract.ReviewEntry.TABLE_NAME, null, contentValues);
+                returnUri = DatabaseContract.ReviewEntry.CONTENT_URI.buildUpon().appendPath(String.valueOf(reviewRowId)).build();
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -131,62 +121,49 @@ public class MovieProvider extends ContentProvider {
         return returnUri;
     }
 
-    /*
-    * 重写 delete 方法
-    * */
     @Override
     public int delete(Uri uri, String whereClause, String[] whereArgs) {
         int deleteRowId = 0;
         switch (uriMatcher.match(uri)) {
             case TABLE_DETAIL_DIR:
-                deleteRowId = database.delete(MovieContract.DetailEntry.TABLE_NAME, whereClause, whereArgs);
+                deleteRowId = database.delete(DatabaseContract.DetailEntry.TABLE_NAME, whereClause, whereArgs);
                 break;
-//            case TABLE_DETAIL_ITEM:
-//                break;
             case TABLE_TRAILER_DIR:
-                deleteRowId = database.delete(MovieContract.TrailerEntry.TABLE_NAME, whereClause, whereArgs);
+                deleteRowId = database.delete(DatabaseContract.TrailerEntry.TABLE_NAME, whereClause, whereArgs);
                 break;
-//            case TABLE_TRAILER_ITEM:
-//                break;
             case TABLE_REVIEW_DIR:
-                deleteRowId = database.delete(MovieContract.ReviewEntry.TABLE_NAME, whereClause, whereArgs);
+                deleteRowId = database.delete(DatabaseContract.ReviewEntry.TABLE_NAME, whereClause, whereArgs);
                 break;
-//            case TABLE_TRAILER_ITEM:
-//                break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
         return deleteRowId;
     }
 
-    /*
-    * 重写 update 方法
-    * */
     @Override
     public int update(Uri uri, ContentValues contentValues, String whereClause, String[] whereArgs) {
         int updateRowId = 0;
         switch (uriMatcher.match(uri)) {
             case TABLE_DETAIL_DIR:
-                updateRowId = database.update(MovieContract.DetailEntry.TABLE_NAME, contentValues, whereClause, whereArgs);
+                updateRowId = database.update(DatabaseContract.DetailEntry.TABLE_NAME, contentValues, whereClause, whereArgs);
                 break;
             case TABLE_DETAIL_ITEM:
                 String movieId = uri.getLastPathSegment();
-                updateRowId = database.update(MovieContract.DetailEntry.TABLE_NAME, contentValues,
-                        MovieContract.DetailEntry.COLUMN_MOVIE_ID + " = ?",
+                updateRowId = database.update(DatabaseContract.DetailEntry.TABLE_NAME, contentValues,
+                        DatabaseContract.DetailEntry.COLUMN_MOVIE_ID + " = ?",
                         new String[]{movieId});
                 break;
             case TABLE_TRAILER_DIR:
-                updateRowId = database.update(MovieContract.TrailerEntry.TABLE_NAME, contentValues, whereClause, whereArgs);
+                updateRowId = database.update(DatabaseContract.TrailerEntry.TABLE_NAME, contentValues, whereClause, whereArgs);
                 break;
-//            case TABLE_TRAILER_ITEM:
-//                break;
             case TABLE_REVIEW_DIR:
-                updateRowId = database.update(MovieContract.ReviewEntry.TABLE_NAME, contentValues, whereClause, whereArgs);
+                updateRowId = database.update(DatabaseContract.ReviewEntry.TABLE_NAME, contentValues, whereClause, whereArgs);
                 break;
-//            case TABLE_REVIEW_ITEM:
-//                break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
+        }
+        if (updateRowId != 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
         }
         return updateRowId;
     }

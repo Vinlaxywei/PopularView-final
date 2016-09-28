@@ -1,9 +1,6 @@
 package com.example.hhoo7.popularview;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -13,45 +10,44 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.GridView;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.hhoo7.popularview.data.MovieContract;
+import com.example.hhoo7.popularview.data.DatabaseContract;
 import com.example.hhoo7.popularview.service.MovieService;
 
 public class MovieFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
-
     private String LOG_TAG = MovieFragment.class.getSimpleName();
 
-    // 这个Adapter将使用cursor提取数据，并填充到gridview中
     private MovieAdapter mForecastAdapter;
-    // Loader专用识别号
+    private RecyclerView mRecyclerView;
+
     private static final int MOVIE_LOADER = 0;
 
-    private GridView gridView;
-
     /*
-    * 将表格的列集封装成一个数组，并给出镜像的列号
+    * 将表格的列集封装成一个数组
     * */
     public static final String[] DETAIL_COLUMNS = {
-            MovieContract.DetailEntry.COLUMN_MOVIE_ID,
-            MovieContract.DetailEntry.COLUMN_MOVIE_TITLE,
-            MovieContract.DetailEntry.COLUMN_POSTER_PATH,
-            MovieContract.DetailEntry.COLUMN_VOTE_AVERAGE,
-            MovieContract.DetailEntry.COLUMN_POPULARITY,
-            MovieContract.DetailEntry.COLUMN_OVER_VIEW,
-            MovieContract.DetailEntry.COLUMN_RELEASE_DATE,
-            MovieContract.DetailEntry.COLUMN_RUNTIME,
-            MovieContract.DetailEntry.COLUMN_FAVORITE
+            DatabaseContract.DetailEntry.COLUMN_MOVIE_ID,
+            DatabaseContract.DetailEntry.COLUMN_MOVIE_TITLE,
+            DatabaseContract.DetailEntry.COLUMN_POSTER_PATH,
+            DatabaseContract.DetailEntry.COLUMN_VOTE_AVERAGE,
+            DatabaseContract.DetailEntry.COLUMN_POPULARITY,
+            DatabaseContract.DetailEntry.COLUMN_OVER_VIEW,
+            DatabaseContract.DetailEntry.COLUMN_RELEASE_DATE,
+            DatabaseContract.DetailEntry.COLUMN_RUNTIME,
+            DatabaseContract.DetailEntry.COLUMN_FAVORITE
     };
+
+    // 给出镜像列的列号
     static final int COL_MOVIE_ID = 0;
     static final int COL_MOVIE_TITLE = 1;
     static final int COL_POSTER_PATH = 2;
@@ -62,40 +58,37 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
     static final int COL_RUNTIME = 7;
     static final int COL_FAVORITE = 8;
 
+    // 预告片表格镜像
     public static final String[] TRAILERS_COLUMNS = {
-            MovieContract.TrailerEntry.COLUMN_MOVIE_ID,
-            MovieContract.TrailerEntry.COLUMN_VIDEO_TITLE,
-            MovieContract.TrailerEntry.COLUMN_VIDEO_LINK
+            DatabaseContract.TrailerEntry.COLUMN_MOVIE_ID,
+            DatabaseContract.TrailerEntry.COLUMN_VIDEO_TITLE,
+            DatabaseContract.TrailerEntry.COLUMN_VIDEO_LINK
     };
     //    static final int COL_MOVIE_ID = 0;
     static final int COL_VIDEO_TITLE = 1;
     static final int COL_VIDEO_LINK = 2;
 
+    // 评论表格镜像
     public static final String[] REVIEWS_COLUMNS = {
-            MovieContract.ReviewEntry.COLUMN_MOVIE_ID,
-            MovieContract.ReviewEntry.COLUMN_REVIEW_AUTHOR,
-            MovieContract.ReviewEntry.COLUMN_REVIEW_CONTENT
+            DatabaseContract.ReviewEntry.COLUMN_MOVIE_ID,
+            DatabaseContract.ReviewEntry.COLUMN_REVIEW_AUTHOR,
+            DatabaseContract.ReviewEntry.COLUMN_REVIEW_CONTENT
     };
     //    static final int COL_MOVIE_ID = 0;
     static final int COL_REVIEW_AUTHOR = 1;
     static final int COL_REVIEW_CONTENT = 2;
 
-    // 这个变量将用于储存视图恢复时的view的当前位置的key
     private static final String SELETOR_KEY = "key";
-    // 这个变量用于存储当前滑动位置，为了防止用户并没有点击任何一部电影，这里默认设置为无效位置
-    private int mPosition = GridView.INVALID_POSITION;
+    private int mPosition = RecyclerView.NO_POSITION;
 
     // 这个变量用于存储用户当前的电影排序方式。
     private static String mMode;
 
-    // 构建回调函数，当用户点击时，能够获取当前电影的Uri
+    // 构建回调函数，当用户点击时，能够传递当前电影的Uri
     public interface CallBack {
-        public void onItemSelected(Uri dateUri);
+        void onItemSelected(Uri dateUri, MovieAdapter.MovieViewHolder viewHolder);
     }
 
-    /*
-    * 构造函数
-    * */
     public MovieFragment() {
     }
 
@@ -103,12 +96,8 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        getActivity().startService(new Intent(getContext(), MovieService.class));
     }
 
-    /*
-    * 调用菜单文件
-    * */
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_main, menu);
@@ -117,29 +106,24 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            // 刷新按钮：启动AsyncTask，更新数据及视图
             case R.id.action_refresh:
                 upData();
                 onModeChange();
                 return true;
 
-            // 设置按钮：跳转到设置界面
             case R.id.action_setting:
                 startActivity(new Intent(getActivity(), SettingsActivity.class));
                 return true;
 
-            /*
-            * 清理按钮：一键清除所有收藏的电影。
-            * */
             case R.id.action_clean:
-                /*
-                * 首先将所有电影数据写入0值，也就是变成未收藏的状态
-                * */
+                // 首先将所有电影数据写入0值，也就是变成未收藏的状态
                 ContentValues contentValue = new ContentValues();
-                contentValue.put(MovieContract.DetailEntry.COLUMN_FAVORITE, 0);
-                getActivity().getContentResolver().update(MovieContract.DetailEntry.CONTENT_URI, contentValue, null, null);
+                contentValue.put(DatabaseContract.DetailEntry.COLUMN_FAVORITE, 0);
+                getActivity().getContentResolver().update(DatabaseContract.DetailEntry.CONTENT_URI, contentValue, null, null);
+
                 // 弹出Toast提醒，提醒用户相应成功
                 Toast.makeText(getActivity(), "所有收藏已清除", Toast.LENGTH_SHORT).show();
+
                 // 刷新视图
                 onModeChange();
                 return true;
@@ -150,40 +134,22 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
     @Nullable
     @Override
     public View onCreateView(final LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        // 实例化Adapter。
-        mForecastAdapter = new MovieAdapter(getActivity(), null, 0);
-
-        /*
-        * 调用GridView，绑定适配器
-        * */
-        View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-        gridView = (GridView) rootView.findViewById(R.id.movie_gridview);
-        gridView.setAdapter(mForecastAdapter);
-
-        TextView emptyView = (TextView) rootView.findViewById(R.id.movie_gridview_empty);
-        if (Utility.getModeFromPreference(getActivity()).equals(getString(R.string.pref_movieSort_myFavorite))) {
-            emptyView.setText(R.string.toast_display_noFavorite);
-        }
-        gridView.setEmptyView(emptyView);
-
-        /*
-        * GridView设置点击监听器，触发后传递解析后的电影相关信息，并调转到电影详情界面
-        * */
-        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        mForecastAdapter = new MovieAdapter(getActivity(), new MovieAdapter.AdapterOnClickHandler() {
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                // 获取当前 cursor
-                Cursor cursor = (Cursor) adapterView.getItemAtPosition(i);
-                if (cursor != null) {
-                    // 使用回调函数的方法将当前点击的电影的Uri传递出去
-                    ((CallBack) getActivity()).onItemSelected((MovieContract.DetailEntry.buildMovieIdUri(
-                            cursor.getString(cursor.getColumnIndex(MovieContract.DetailEntry.COLUMN_MOVIE_ID)))));
-                }
-                // 保存当前位置
-                mPosition = i;
-            }
+            public void onClickHandler(String movieId, MovieAdapter.MovieViewHolder viewHolder) {
+                ((CallBack) getActivity()).onItemSelected((DatabaseContract.DetailEntry.buildMovieIdUri(
+                        movieId)),viewHolder);
 
+                // 保存当前位置
+                mPosition = viewHolder.getAdapterPosition();
+            }
         });
+
+        View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.movie_gridview);
+        mRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
+        mRecyclerView.setHasFixedSize(true);
+        mRecyclerView.setAdapter(mForecastAdapter);
 
         // 检查空值，如果不为空，则滑动到之前的位置
         if (savedInstanceState != null && savedInstanceState.containsKey(SELETOR_KEY)) {
@@ -196,26 +162,10 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
     @Override
     public void onSaveInstanceState(Bundle outState) {
         // 当视图切换时，检查用户当前位置，如果位置有效，则将其存储下来
-        if (mPosition != GridView.INVALID_POSITION) {
+        if (mPosition != RecyclerView.NO_POSITION) {
             outState.putInt(SELETOR_KEY, mPosition);
         }
         super.onSaveInstanceState(outState);
-    }
-
-    @Override
-    public void onStart() {
-        /*
-        * 判断当前布局模式，如果是平板则设定三列显示模式
-        * */
-        if (MainActivity.mTwoPane) {
-            gridView.setNumColumns(3);
-        } else {
-            gridView.setNumColumns(2);
-        }
-
-        // 进入视图第一时间启动Loader更新
-        onModeChange();
-        super.onStart();
     }
 
     /*
@@ -228,21 +178,16 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
         super.onActivityCreated(savedInstanceState);
     }
 
-    /*
-    * 将更新数据的具体细节封装成一个函数。
-    * if判断：调用检查网络的方法，检查设备网络状况，无网络时弹出提示
-    * */
-    public void upData() {
+    @Override
+    public void onStart() {
+        super.onStart();
+        upData();
+    }
+
+    private void upData() {
         if (Utility.isOnline(getActivity())) {
-            // 创建Intent对象，目标指向广播接收器。可在此处传入需要传递给service的信息
-            Intent alarmIntent = new Intent(getContext(), MovieService.alarm.class);
-
-            // 设置启动次数，同时绑定Intent数据到此处
-            PendingIntent pi = PendingIntent.getBroadcast(getActivity(), 0, alarmIntent, PendingIntent.FLAG_ONE_SHOT);
-            // 创建AlarmManager。并设置延时时间，绑定Intent。
-            AlarmManager am = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
-            am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 1000, pi);
-
+            Intent intent = new Intent(getContext(), MovieService.class);
+            getContext().startService(intent);
         } else {
             Toast.makeText(getActivity(),
                     R.string.toast_display_offLine,
@@ -251,40 +196,33 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
         }
     }
 
-    /*
-    * 除了onCreate方法之外，这个方法也将初始化的操作封装起来，便于其他地方调用
-    * */
     void onModeChange() {
         if (Utility.getModeFromPreference(getActivity()).equals(getString(R.string.pref_movieSort_myFavorite))) {
             getLoaderManager().restartLoader(MOVIE_LOADER, null, this);
         } else {
-//            upData();
             getLoaderManager().restartLoader(MOVIE_LOADER, null, this);
         }
 
     }
 
-    /*
-    * 重写创建Loader的方法
-    * */
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         CursorLoader cursorLoader = null;
 
-        // switch判断：根据用户选择的电影排序方式，给出相应的加载器
+        // switch判断：根据用户选择的电影排序方式，返回对应的 loader
         switch (Utility.getModeFromPreference(getActivity())) {
             case "popular":
-                cursorLoader = new CursorLoader(getActivity(), MovieContract.DetailEntry.CONTENT_URI, null, null, null, MovieContract.DetailEntry.COLUMN_POPULARITY + " DESC");
+                cursorLoader = new CursorLoader(getActivity(), DatabaseContract.DetailEntry.CONTENT_URI, null, null, null, DatabaseContract.DetailEntry.COLUMN_POPULARITY + " DESC");
                 break;
             case "top_rated":
-                cursorLoader = new CursorLoader(getActivity(), MovieContract.DetailEntry.CONTENT_URI, null, null, null, MovieContract.DetailEntry.COLUMN_VOTE_AVERAGE + " DESC");
+                cursorLoader = new CursorLoader(getActivity(), DatabaseContract.DetailEntry.CONTENT_URI, null, null, null, DatabaseContract.DetailEntry.COLUMN_VOTE_AVERAGE + " DESC");
                 break;
             case "myFavorite":
                 cursorLoader = new CursorLoader(
                         getActivity(),
-                        MovieContract.DetailEntry.CONTENT_URI,
-                        null,
-                        MovieContract.DetailEntry.COLUMN_FAVORITE + " = ? ",
+                        DatabaseContract.DetailEntry.CONTENT_URI,
+                        DETAIL_COLUMNS,
+                        DatabaseContract.DetailEntry.COLUMN_FAVORITE + " = ? ",
                         new String[]{String.valueOf(1)},
                         null);
                 break;
@@ -303,10 +241,10 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
         String mode = Utility.getModeFromPreference(getActivity());
         if (mode.equals(mMode) && mMode != null) {
             if (mPosition != GridView.INVALID_POSITION) {
-                gridView.smoothScrollToPosition(mPosition);
+                mRecyclerView.smoothScrollToPosition(mPosition);
             }
         } else if (!mode.equals(mMode)) {
-            gridView.smoothScrollToPosition(GridView.SCROLLBAR_POSITION_DEFAULT);
+            mRecyclerView.smoothScrollToPosition(RecyclerView.SCROLLBAR_POSITION_DEFAULT);
         }
         mMode = mode;
 

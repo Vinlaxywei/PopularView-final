@@ -2,14 +2,14 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <ListPreference
-        android:defaultValue="@string/pref_movieSort_defalutValue"
+        android:defaultValue="@string/pref_movieSort_popular"
         android:entries="@array/pref_movieSort_options"
         android:entryValues="@array/pref_movieSort_values"
         android:key="@string/pref_movieSort_key"
         android:title="@string/pref_movieSort_title" />
 
     <ListPreference
-        android:defaultValue="@string/pref_posterSize_defalutValue"
+        android:defaultValue="@string/pref_posterSize_defalut"
         android:entries="@array/pref_posterSize_options"
         android:entryValues="@array/pref_posterSize_values"
         android:key="@string/pref_posterSize_key"

@@ -1,18 +1,22 @@
 <resources>
+
     <string name="app_name">PopularView</string>
+
+    <!--action-->
     <string name="action_setting">设置</string>
     <string name="action_refresh">刷新</string>
     <string name="action_clean">清除所有收藏</string>
-    <string name="title_activity_settings">设置</string>
-    <string name="DetailActivitty_label">电影详情</string>
-    <string name="toast_display_offLine">网络状态不好哦，建议查看联网状态并尝试刷新</string>
+    <string name="action_share">分享</string>
 
-    <!--设置菜单用到的字符串-->
+    <!--activity 标题-->
+    <string name="setting_activity_title">设置</string>
+    <string name="detail_activitty_title">电影详情</string>
+
     <!--电影排序选项-->
     <string name="pref_movieSort_title">电影排序</string>
     <string name="pref_movieSort_key">movieSort</string>
-    <string name="pref_movieSort_defalutValue">popular</string>
-    <string name="pref_movieSort_top_rated">top_rated</string>
+    <string name="pref_movieSort_popular">popular</string>
+    <string name="pref_movieSort_topRated">top_rated</string>
     <string name="pref_movieSort_myFavorite">myFavorite</string>
     <string-array name="pref_movieSort_options">
         <item>最受欢迎</item>
@@ -20,15 +24,15 @@
         <item>我的收藏</item>
     </string-array>
     <string-array name="pref_movieSort_values">
-        <item>@string/pref_movieSort_defalutValue</item>
-        <item>@string/pref_movieSort_top_rated</item>
+        <item>@string/pref_movieSort_popular</item>
+        <item>@string/pref_movieSort_topRated</item>
         <item>@string/pref_movieSort_myFavorite</item>
     </string-array>
 
     <!--电影海报尺寸选项-->
     <string name="pref_posterSize_title">图片质量</string>
     <string name="pref_posterSize_key">posterSize</string>
-    <string name="pref_posterSize_defalutValue">185</string>
+    <string name="pref_posterSize_defalut">185</string>
     <string-array name="pref_posterSize_options">
         <item>标清</item>
         <item>高清</item>
@@ -52,12 +56,15 @@
     <string name="detail_fragment_notYetTrailer">暂无预告</string>
     <string name="detail_fragment_reviewText">评论区</string>
     <string name="detail_fragment_notYetReview">暂无评论</string>
-    <string name="action_share">Share</string>
+
     <string name="detail_like">收藏</string>
     <string name="detail_liked">已收藏</string>
-    <string name="detail_unLike">取消收藏</string>
     <string name="toast_display_like_msg">电影收藏成功，设置菜单中选择我的收藏可查看所有已收藏的电影</string>
     <string name="toast_display_unlike_msg">取消收藏</string>
-    <string name="display_offLine">当前电影数据无，尝试连接网络或者刷新一下</string>
     <string name="toast_display_noFavorite">暂无收藏电影</string>
+
+    <string name="toast_display_offLine">网络状态不好哦，建议查看联网状态并尝试刷新</string>
+
+    <string name="transitionName_poster">posterView</string>
+    <string name="transitionName_title">titleView</string>
 </resources>

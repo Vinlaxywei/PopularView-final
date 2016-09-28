@@ -1,9 +1,7 @@
 package com.example.hhoo7.popularview.service;
 
 import android.app.IntentService;
-import android.content.BroadcastReceiver;
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -11,7 +9,7 @@ import android.util.Log;
 
 import com.example.hhoo7.popularview.BuildConfig;
 import com.example.hhoo7.popularview.Utility;
-import com.example.hhoo7.popularview.data.MovieContract;
+import com.example.hhoo7.popularview.data.DatabaseContract;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -54,7 +52,7 @@ public class MovieService extends IntentService {
 
     @Override
     public void onDestroy() {
-        Log.d(LOG_TAG, "onDestroy: Stop Service");
+        Log.d(LOG_TAG, "onDestroy: ");
         super.onDestroy();
 
     }
@@ -179,7 +177,7 @@ public class MovieService extends IntentService {
                 popularity = movieDataInfo.getString("popularity");
 
                 Cursor checkCursor = this.getContentResolver().query(
-                        MovieContract.DetailEntry.buildMovieIdUri(movieID),
+                        DatabaseContract.DetailEntry.buildMovieIdUri(movieID),
                         null,
                         null,
                         null,
@@ -190,27 +188,27 @@ public class MovieService extends IntentService {
                 if (checkCursor.moveToFirst()) {
 
                     ContentValues values = new ContentValues();
-                    values.put(MovieContract.DetailEntry.COLUMN_POSTER_PATH, posterPath);
-                    values.put(MovieContract.DetailEntry.COLUMN_VOTE_AVERAGE, voteAverage);
-                    values.put(MovieContract.DetailEntry.COLUMN_POPULARITY, popularity);
+                    values.put(DatabaseContract.DetailEntry.COLUMN_POSTER_PATH, posterPath);
+                    values.put(DatabaseContract.DetailEntry.COLUMN_VOTE_AVERAGE, voteAverage);
+                    values.put(DatabaseContract.DetailEntry.COLUMN_POPULARITY, popularity);
                     this.getContentResolver().update(
-                            MovieContract.DetailEntry.CONTENT_URI,
+                            DatabaseContract.DetailEntry.CONTENT_URI,
                             values,
-                            MovieContract.DetailEntry.COLUMN_MOVIE_ID + " = ?",
+                            DatabaseContract.DetailEntry.COLUMN_MOVIE_ID + " = ?",
                             new String[]{movieID});
 
                 } else {
 
                     ContentValues values = new ContentValues();
-                    values.put(MovieContract.DetailEntry.COLUMN_MOVIE_TITLE, movieTitle);
-                    values.put(MovieContract.DetailEntry.COLUMN_POSTER_PATH, posterPath);
-                    values.put(MovieContract.DetailEntry.COLUMN_OVER_VIEW, movieOverView);
-                    values.put(MovieContract.DetailEntry.COLUMN_VOTE_AVERAGE, voteAverage);
-                    values.put(MovieContract.DetailEntry.COLUMN_RELEASE_DATE, releaseDate);
-                    values.put(MovieContract.DetailEntry.COLUMN_MOVIE_ID, movieID);
-                    values.put(MovieContract.DetailEntry.COLUMN_POPULARITY, popularity);
-                    values.put(MovieContract.DetailEntry.COLUMN_FAVORITE, 0);
-                    this.getContentResolver().insert(MovieContract.DetailEntry.CONTENT_URI, values);
+                    values.put(DatabaseContract.DetailEntry.COLUMN_MOVIE_TITLE, movieTitle);
+                    values.put(DatabaseContract.DetailEntry.COLUMN_POSTER_PATH, posterPath);
+                    values.put(DatabaseContract.DetailEntry.COLUMN_OVER_VIEW, movieOverView);
+                    values.put(DatabaseContract.DetailEntry.COLUMN_VOTE_AVERAGE, voteAverage);
+                    values.put(DatabaseContract.DetailEntry.COLUMN_RELEASE_DATE, releaseDate);
+                    values.put(DatabaseContract.DetailEntry.COLUMN_MOVIE_ID, movieID);
+                    values.put(DatabaseContract.DetailEntry.COLUMN_POPULARITY, popularity);
+                    values.put(DatabaseContract.DetailEntry.COLUMN_FAVORITE, 0);
+                    this.getContentResolver().insert(DatabaseContract.DetailEntry.CONTENT_URI, values);
 
                 }
                 checkCursor.close();
@@ -220,15 +218,15 @@ public class MovieService extends IntentService {
             * 使用cursor遍历movieid，调用getTrailerAndReviewFromJson方法进行单部电影的数据写入
             * */
             Cursor cursor = this.getContentResolver().query(
-                    MovieContract.DetailEntry.CONTENT_URI,
-                    new String[]{MovieContract.DetailEntry.COLUMN_MOVIE_ID},
+                    DatabaseContract.DetailEntry.CONTENT_URI,
+                    new String[]{DatabaseContract.DetailEntry.COLUMN_MOVIE_ID},
                     null,
                     null,
-                    MovieContract.DetailEntry.COLUMN_POPULARITY + " DESC"
+                    DatabaseContract.DetailEntry.COLUMN_POPULARITY + " DESC"
             );
             if (cursor.moveToFirst()) {
                 do {
-                    getTrailerAndReviewFromJson(cursor.getString(cursor.getColumnIndex(MovieContract.DetailEntry.COLUMN_MOVIE_ID)));
+                    getTrailerAndReviewFromJson(cursor.getString(cursor.getColumnIndex(DatabaseContract.DetailEntry.COLUMN_MOVIE_ID)));
                 } while (cursor.moveToNext());
             }
             cursor.close();
@@ -261,11 +259,11 @@ public class MovieService extends IntentService {
             * */
             String runtiem = jsonData.getString("runtime");
             ContentValues detailValue = new ContentValues();
-            detailValue.put(MovieContract.DetailEntry.COLUMN_RUNTIME, runtiem);
+            detailValue.put(DatabaseContract.DetailEntry.COLUMN_RUNTIME, runtiem);
             this.getContentResolver().update(
-                    MovieContract.DetailEntry.CONTENT_URI,
+                    DatabaseContract.DetailEntry.CONTENT_URI,
                     detailValue,
-                    MovieContract.DetailEntry.COLUMN_MOVIE_ID + " = ? ",
+                    DatabaseContract.DetailEntry.COLUMN_MOVIE_ID + " = ? ",
                     new String[]{movieId}
             );
 
@@ -277,19 +275,19 @@ public class MovieService extends IntentService {
                 String VideoLink = youtubeInfo.getString("source");
 
                 ContentValues trailerValue = new ContentValues();
-                trailerValue.put(MovieContract.TrailerEntry.COLUMN_MOVIE_ID, movieId);
-                trailerValue.put(MovieContract.TrailerEntry.COLUMN_VIDEO_TITLE, VideoTitle);
-                trailerValue.put(MovieContract.TrailerEntry.COLUMN_VIDEO_LINK, VideoLink);
+                trailerValue.put(DatabaseContract.TrailerEntry.COLUMN_MOVIE_ID, movieId);
+                trailerValue.put(DatabaseContract.TrailerEntry.COLUMN_VIDEO_TITLE, VideoTitle);
+                trailerValue.put(DatabaseContract.TrailerEntry.COLUMN_VIDEO_LINK, VideoLink);
 
                 Cursor checkCursor = this.getContentResolver().query(
-                        MovieContract.TrailerEntry.CONTENT_URI,
+                        DatabaseContract.TrailerEntry.CONTENT_URI,
                         null,
-                        MovieContract.TrailerEntry.COLUMN_VIDEO_TITLE + " = ? and " + MovieContract.TrailerEntry.COLUMN_MOVIE_ID + " = ? ",
+                        DatabaseContract.TrailerEntry.COLUMN_VIDEO_TITLE + " = ? and " + DatabaseContract.TrailerEntry.COLUMN_MOVIE_ID + " = ? ",
                         new String[]{VideoTitle, movieId},
                         null);
 
                 if (!checkCursor.moveToFirst()) {
-                    this.getContentResolver().insert(MovieContract.TrailerEntry.CONTENT_URI, trailerValue);
+                    this.getContentResolver().insert(DatabaseContract.TrailerEntry.CONTENT_URI, trailerValue);
                 }
                 checkCursor.close();
             }
@@ -302,19 +300,19 @@ public class MovieService extends IntentService {
                 String reviewContent = reviewInfo.getString("content");
 
                 ContentValues reviewValue = new ContentValues();
-                reviewValue.put(MovieContract.ReviewEntry.COLUMN_MOVIE_ID, movieId);
-                reviewValue.put(MovieContract.ReviewEntry.COLUMN_REVIEW_AUTHOR, reviewAuthor);
-                reviewValue.put(MovieContract.ReviewEntry.COLUMN_REVIEW_CONTENT, reviewContent);
+                reviewValue.put(DatabaseContract.ReviewEntry.COLUMN_MOVIE_ID, movieId);
+                reviewValue.put(DatabaseContract.ReviewEntry.COLUMN_REVIEW_AUTHOR, reviewAuthor);
+                reviewValue.put(DatabaseContract.ReviewEntry.COLUMN_REVIEW_CONTENT, reviewContent);
 
                 Cursor checkCursor = this.getContentResolver().query(
-                        MovieContract.ReviewEntry.CONTENT_URI,
+                        DatabaseContract.ReviewEntry.CONTENT_URI,
                         null,
-                        MovieContract.ReviewEntry.COLUMN_REVIEW_AUTHOR + " = ? and " + MovieContract.ReviewEntry.COLUMN_MOVIE_ID + " = ? ",
+                        DatabaseContract.ReviewEntry.COLUMN_REVIEW_AUTHOR + " = ? and " + DatabaseContract.ReviewEntry.COLUMN_MOVIE_ID + " = ? ",
                         new String[]{reviewAuthor, movieId},
                         null);
 
                 if (!checkCursor.moveToFirst()) {
-                    this.getContentResolver().insert(MovieContract.ReviewEntry.CONTENT_URI, reviewValue);
+                    this.getContentResolver().insert(DatabaseContract.ReviewEntry.CONTENT_URI, reviewValue);
                 }
                 checkCursor.close();
             }
@@ -324,12 +322,4 @@ public class MovieService extends IntentService {
         }
     }
 
-    public static class alarm extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            // 在启动服务方和被启动服务之前创建一个广播接收器屏障
-            Intent sendIntent = new Intent(context,MovieService.class);
-            context.startService(sendIntent);
-        }
-    }
 }

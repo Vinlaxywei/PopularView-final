@@ -1,10 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
 
-    <color name="colorBlack">#000000</color>
-    <color name="mLayout_light">#E1F5FE</color>f
-    <color name="divider_line">#E0E0E0</color>f
+    <color name="Appbar_primary">#F44336</color>
+    <color name="Appbar_primary_dark">#D32F2F</color>
+
+    <!--应用整体色调-->
+    <color name="primary_color">#E1F5FE</color>
+    <color name="detail_primary_color">@color/primary_color</color>
+
+    <!--分割线颜色-->
+    <color name="divider_line">#E0E0E0</color>
+
+    <!--应用字体色调-->
+    <color name="primary_text">#000000</color>
+    <color name="secondary_text">#E0E0E0</color>
+
+    <color name="like_press_color">#F4FF81</color>
+
 </resources>

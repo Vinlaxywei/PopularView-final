@@ -22,9 +22,9 @@ public class Utility{
     public static void loadPicture(Context context, String posterUri, ImageView currentView) {
         Picasso.with(context).load(posterUri)
                 //如果图片正在下载，将会显示这张图片
-                .placeholder(R.drawable.im_loading)
+                .placeholder(R.drawable.poster_loading)
                 //如果图片下载失败，将会显示这张图片
-                .error(R.drawable.im_error)
+                .error(R.drawable.poster_error)
                 .into(currentView);
     }
 
@@ -32,14 +32,14 @@ public class Utility{
     public static String getModeFromPreference(Context context) {
         SharedPreferences mPref = PreferenceManager.getDefaultSharedPreferences(context);
         return mPref.getString(context.getString(R.string.pref_movieSort_key),
-                context.getString(R.string.pref_movieSort_defalutValue));
+                context.getString(R.string.pref_movieSort_popular));
     }
 
     // 获取用户设置的电影海报的清晰度
     public static String getPosterSizePreference(Context context) {
         SharedPreferences mPref = PreferenceManager.getDefaultSharedPreferences(context);
         return mPref.getString(context.getString(R.string.pref_posterSize_key),
-                context.getString(R.string.pref_posterSize_defalutValue));
+                context.getString(R.string.pref_posterSize_defalut));
     }
 
     /*
@@ -61,8 +61,7 @@ public class Utility{
     * @return 设备网络情况
     * */
     public static boolean isOnline(Context context) {
-        ConnectivityManager cm =
-                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo netInfo = cm.getActiveNetworkInfo();
         return netInfo != null && netInfo.isConnectedOrConnecting();
     }
